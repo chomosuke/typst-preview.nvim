@@ -1,15 +1,28 @@
+-- Responsible for downloading typst-preview binary from github.
+
 local M = {
+  -- Exposing this so when platform detection fails user can manually set
+  -- bin_name
   bin_name = nil,
 }
 
+function M.is_windows()
+  return vim.loop.os_uname().sysname == 'Windows_NT'
+end
+
+function M.is_macos()
+  return vim.loop.os_uname().sysname == 'Darwin'
+end
+
+function M.is_linux()
+  return vim.loop.os_uname().sysname == 'Linux'
+end
+
 function M.get_bin_name()
   local os_uname = vim.loop.os_uname()
-  local sysname = os_uname.sysname
   if M.bin_name == nil then
     local arch_aliases = { -- Stolen from mason.nvim
       ['x86_64'] = 'x64',
-      ['i386'] = 'ia32',
-      ['i686'] = 'ia32', -- x86 compat
       ['aarch64'] = 'arm64',
       ['aarch64_be'] = 'arm64',
       ['armv8b'] = 'arm64', -- arm64 compat
@@ -17,17 +30,19 @@ function M.get_bin_name()
     }
     local machine = arch_aliases[os_uname.machine] or os_uname.machine
 
-    if sysname == 'Darwin' then
-      M.bin_name = 'typst-preview-darwin-' .. machine
-    elseif sysname == 'Linux' then
-      M.bin_name = 'typst-preview-linux-' .. machine
-    elseif sysname == 'Windows_NT' then
-      M.bin_name = 'typst-preview-win32-' .. machine .. '.exe'
+    if machine == 'x64' or machine == 'arm64' then
+      if M.is_macos() then
+        M.bin_name = 'typst-preview-darwin-' .. machine
+      elseif M.is_macos() then
+        M.bin_name = 'typst-preview-linux-' .. machine
+      elseif M.is_windows() then
+        M.bin_name = 'typst-preview-win32-' .. machine .. '.exe'
+      end
     end
 
     if M.bin_name == nil then
       vim.notify(
-        "typst-preview can't figure out your OS / system architecture!\n"
+        "typst-preview can't figure out your platform.\n"
           .. 'Please report this bug.\n'
           .. 'os_uname: '
           .. vim.inspect(os_uname),
@@ -63,12 +78,20 @@ function M.fetch(callback)
     if code ~= 0 then
       vim.notify('Downloading typst-preview binary failed, exit code: ' .. code)
     else
-      print(
-        'typst-preview binary downloaded to '
-          .. path
-          .. '\nYou may want to manually delete it if uninstalling typst-preview.nvim'
-      )
-      callback()
+      local function finish()
+        print(
+          'typst-preview binary downloaded to '
+            .. path
+            .. '\nYou may want to manually delete it if uninstalling typst-preview.nvim'
+        )
+        callback()
+      end
+      if not M.is_windows() then
+        -- Set executable permission
+        vim.loop.spawn('chmod', { args = { '+x', path } }, finish)
+      else
+        finish()
+      end
     end
   end)
   local function read_progress(err, data)
