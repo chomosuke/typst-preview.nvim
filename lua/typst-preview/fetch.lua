@@ -1,9 +1,11 @@
--- Responsible for downloading typst-preview binary from github.
+-- Responsible for downloading all required binary.
+-- Currently includes typst-preview and websocat
 
 local M = {
   -- Exposing this so when platform detection fails user can manually set
   -- bin_name
-  bin_name = nil,
+  typst_bin_name = nil,
+  websocat_bin_name = nil,
 }
 
 function M.is_windows()
@@ -18,52 +20,95 @@ function M.is_linux()
   return vim.loop.os_uname().sysname == 'Linux'
 end
 
-function M.get_bin_name()
-  local os_uname = vim.loop.os_uname()
-  if M.bin_name == nil then
-    local arch_aliases = { -- Stolen from mason.nvim
-      ['x86_64'] = 'x64',
-      ['aarch64'] = 'arm64',
-      ['aarch64_be'] = 'arm64',
-      ['armv8b'] = 'arm64', -- arm64 compat
-      ['armv8l'] = 'arm64', -- arm64 compat
-    }
-    local machine = arch_aliases[os_uname.machine] or os_uname.machine
+-- Stolen from mason.nvim
+function M.is_x64()
+  local machine = vim.loop.os_uname().machine
+  return machine == 'x86_64' or machine == 'x64'
+end
 
-    if machine == 'x64' or machine == 'arm64' then
-      if M.is_macos() then
-        M.bin_name = 'typst-preview-darwin-' .. machine
-      elseif M.is_macos() then
-        M.bin_name = 'typst-preview-linux-' .. machine
-      elseif M.is_windows() then
-        M.bin_name = 'typst-preview-win32-' .. machine .. '.exe'
-      end
-    end
+function M.is_arm64()
+  local machine = vim.loop.os_uname().machine
+  return machine == 'aarch64'
+    or machine == 'aarch64_be'
+    or machine == 'armv8b'
+    or machine == 'armv8l'
+    or machine == 'arm64'
+end
 
-    if M.bin_name == nil then
-      vim.notify(
-        "typst-preview can't figure out your platform.\n"
-          .. 'Please report this bug.\n'
-          .. 'os_uname: '
-          .. vim.inspect(os_uname),
-        vim.log.levels.ERROR
-      )
-    end
+local function get_bin_name(map)
+  local machine
+  if M.is_x64() then
+    machine = 'x64'
+  elseif M.is_arm64() then
+    machine = 'arm64'
   end
-  return M.bin_name
+  local os
+  if M.is_macos() then
+    os = 'macos'
+  elseif M.is_linux() then
+    os = 'linux'
+  elseif M.is_windows() then
+    os = 'windows'
+  end
+
+  if os == nil or machine == nil or map[os][machine] == nil then
+    vim.notify(
+      "typst-preview can't figure out your platform.\n"
+        .. 'Please report this bug.\n'
+        .. 'os_uname: '
+        .. vim.inspect(vim.loop.os_uname()),
+      vim.log.levels.ERROR
+    )
+  end
+
+  return map[os][machine]
+end
+
+function M.get_typst_bin_name()
+  if M.typst_bin_name == nil then
+    M.typst_bin_name = get_bin_name {
+      macos = {
+        arm64 = 'typst-preview-darwin-arm64',
+        x64 = 'typst-preview-darwin-x64',
+      },
+      linux = {
+        arm64 = 'typst-preview-linux-arm64',
+        x64 = 'typst-preview-linux-x64',
+      },
+      windows = {
+        arm64 = 'typst-preview-win32-arm64.exe',
+        x64 = 'typst-preview-win32-x64.exe',
+      },
+    }
+  end
+  return M.typst_bin_name
+end
+
+function M.get_websocat_bin_name()
+  if M.websocat_bin_name == nil then
+    M.websocat_bin_name = get_bin_name {
+      macos = {
+        arm64 = 'websocat.aarch64-apple-darwin',
+        x64 = 'websocat.x86_64-apple-darwin',
+      },
+      linux = {
+        arm64 = 'websocat.aarch64-unknown-linux-musl',
+        x64 = 'websocat.x86_64-unknown-linux-musl',
+      },
+      windows = {
+        arm64 = 'websocat.x86_64-pc-windows-gnu.exe',
+      },
+    }
+  end
+  return M.websocat_bin_name
 end
 
 function M.get_bin_path()
   return vim.fn.fnamemodify(vim.fn.stdpath 'data' .. '/typst-preview/', ':p')
-    .. M.get_bin_name()
 end
 
-function M.fetch(callback)
-  -- from https://docs.github.com/en/repositories/releasing-projects-on-github/linking-to-releases
-  local url = 'https://github.com/Enter-tainer/typst-preview/releases/latest/download/'
-    .. M.get_bin_name()
-  local path = M.get_bin_path()
-
+local function download_bin(url, name, callback)
+  local path = M.get_bin_path() .. name
   local stdin = nil
   local stdout = vim.loop.new_pipe()
   local stderr = vim.loop.new_pipe()
@@ -76,21 +121,15 @@ function M.fetch(callback)
     stdio = { stdin, stdout, stderr },
   }, function(code, _)
     if code ~= 0 then
-      vim.notify('Downloading typst-preview binary failed, exit code: ' .. code)
+      vim.notify(
+        'Downloading ' .. name .. ' binary failed, exit code: ' .. code
+      )
     else
-      local function finish()
-        print(
-          'typst-preview binary downloaded to '
-            .. path
-            .. '\nYou may want to manually delete it if uninstalling typst-preview.nvim'
-        )
-        callback()
-      end
       if not M.is_windows() then
         -- Set executable permission
-        vim.loop.spawn('chmod', { args = { '+x', path } }, finish)
+        vim.loop.spawn('chmod', { args = { '+x', path } }, callback)
       else
-        finish()
+        callback()
       end
     end
   end)
@@ -102,11 +141,37 @@ function M.fetch(callback)
       while progress:len() < 6 do
         progress = ' ' .. progress
       end
-      print('Downloading typst-preview binary ' .. progress)
+      print('Downloading ' .. name .. 'binary ' .. progress)
     end
   end
   stdout:read_start(read_progress)
   stderr:read_start(read_progress)
+end
+
+function M.fetch(callback)
+  local function finish()
+    print(
+      'all binary downloaded to '
+        .. M.get_bin_path()
+        .. '\nYou may want to manually delete it if uninstalling typst-preview.nvim'
+    )
+    callback()
+  end
+
+  -- from https://docs.github.com/en/repositories/releasing-projects-on-github/linking-to-releases
+  download_bin(
+    'https://github.com/Enter-tainer/typst-preview/releases/latest/download/'
+      .. M.get_typst_bin_name(),
+    M.get_typst_bin_name(),
+    function()
+      download_bin(
+        'https://github.com/Enter-tainer/typst-preview/releases/latest/download/'
+          .. M.get_websocat_bin_name(),
+        M.get_websocat_bin_name(),
+        finish
+      )
+    end
+  )
 end
 
 return M
