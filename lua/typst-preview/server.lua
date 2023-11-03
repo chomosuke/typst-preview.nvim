@@ -1,6 +1,6 @@
 local fetch = require 'typst-preview.fetch'
 local utils = require 'typst-preview.utils'
-local config= require 'typst-preview.config'
+local config = require 'typst-preview.config'
 
 -- Responsible for starting, stopping and communicating with the server
 local M = {}
@@ -22,9 +22,8 @@ end
 ---@param bufnr integer
 ---@param on_read function Called when server sends a message, parameter is a string
 ---@param callback function Called after server spawn completes, parameter is
---close and write function where calling close kills the processes and calling
---write write to the server
-function M.spawn(bufnr, on_read, callback)
+--(close, write, read_start)
+function M.spawn(bufnr, callback)
   local file_path = M.get_buffer_path(bufnr)
   local server_stdout = assert(vim.loop.new_pipe())
   local server_stderr = assert(vim.loop.new_pipe())
@@ -46,19 +45,11 @@ function M.spawn(bufnr, on_read, callback)
       })
     )
     utils.debug('websocat connecting to: ' .. addr)
-    stdout:read_start(function(err, data)
-      if err then
-        error(err)
-      elseif data then
-        utils.debug('websocat said: ' .. data)
-        on_read(data)
-      end
-    end)
     stderr:read_start(function(err, data)
       if err then
         error(err)
       elseif data then
-        utils.debug('websocat said: ' .. data)
+        utils.debug('websocat error: ' .. data)
       end
     end)
 
@@ -67,6 +58,15 @@ function M.spawn(bufnr, on_read, callback)
       server_handle:kill()
     end, function(data)
       stdin:write(data)
+    end, function(on_read)
+      stdout:read_start(function(err, data)
+        if err then
+          error(err)
+        elseif data then
+          utils.debug('websocat said: ' .. data)
+          on_read(data)
+        end
+      end)
     end)
   end
 

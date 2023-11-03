@@ -20,15 +20,13 @@ local close = {}
 ---Do all work necessary to start a preview for a buffer.
 ---@param bufnr integer
 function M.watch(bufnr)
-  local server_buf = ''
-  server.spawn(bufnr, function(data)
-    -- TODO: respond to preview scroll.
-  end, function(close_server, write)
+  local buf_path = server.get_buffer_path(bufnr)
+  server.spawn(bufnr, function(close_server, write, read_start)
     local function on_change()
       utils.debug('updating buffer: ' .. bufnr)
       write(
         '{"event":"updateMemoryFiles","files":{"'
-          .. escape_str(server.get_buffer_path(bufnr))
+          .. escape_str(buf_path)
           .. '":"'
           .. escape_str(utils.get_buf_content(bufnr))
           .. '"}}\n'
@@ -40,7 +38,7 @@ function M.watch(bufnr)
       local cursor = vim.api.nvim_win_get_cursor(0)
       write(
         '{"event":"panelScrollTo","filepath":"'
-          .. escape_str(server.get_buffer_path(bufnr))
+          .. escape_str(buf_path)
           .. '","line":'
           .. cursor[1] - 1
           .. ',"character":'
@@ -49,17 +47,26 @@ function M.watch(bufnr)
       )
     end
 
-    local function sync()
-      write(
-        '{"event":"syncMemoryFiles","files":{"'
-          .. escape_str(server.get_buffer_path(bufnr))
-          .. '":"'
-          .. escape_str(utils.get_buf_content(bufnr))
-          .. '"}}\n'
-      )
-    end
-
-    vim.defer_fn(sync, 0)
+    read_start(function(data)
+      vim.defer_fn(function()
+        while data:len() > 0 do
+          local s, _ = data:find '\n'
+          local line = data:sub(1, s - 1)
+          data = data:sub(s + 1, -1)
+          if line:find 'syncEditorChanges' then
+            write(
+              '{"event":"syncMemoryFiles","files":{"'
+                .. escape_str(buf_path)
+                .. '":"'
+                .. escape_str(utils.get_buf_content(bufnr))
+                .. '"}}\n'
+            )
+          elseif line:find '' then
+            -- TODO: respond to preview scroll.
+          end
+        end
+      end, 0)
+    end)
 
     utils.create_autocmds('typst-preview-autocmds-' .. bufnr, {
       {
