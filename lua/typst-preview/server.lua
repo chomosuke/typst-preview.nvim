@@ -1,29 +1,36 @@
 local fetch = require 'typst-preview.fetch'
 local utils = require 'typst-preview.utils'
+local config= require 'typst-preview.config'
 
 -- Responsible for starting, stopping and communicating with the server
 local M = {}
 
 ---Source of truth for dummy file path
+---@param bufnr integer
 ---@return string path
-function M.get_dummy_path()
-  return utils.get_data_path() .. 'dummy.typ'
+function M.get_buffer_path(bufnr)
+  local path = vim.api.nvim_buf_get_name(bufnr)
+  if path == '' then
+    path = utils.get_data_path() .. 'dummy.typ'
+    local f_handle, _ = assert(io.open(path, 'w'))
+    f_handle:close() -- open a file in write mode to create an empty file.
+  end
+  return path
 end
 
 ---Spawn the server and connect to it using the websocat process
+---@param bufnr integer
 ---@param on_read function Called when server sends a message, parameter is a string
 ---@param callback function Called after server spawn completes, parameter is
 --close and write function where calling close kills the processes and calling
 --write write to the server
-function M.spawn(on_read, callback)
-  local file_path = M.get_dummy_path()
-  local f_handle, _ = assert(io.open(file_path, 'w'))
-  f_handle:close() -- open a file in write mode to create an empty file.
+function M.spawn(bufnr, on_read, callback)
+  local file_path = M.get_buffer_path(bufnr)
   local server_stdout = assert(vim.loop.new_pipe())
   local server_stderr = assert(vim.loop.new_pipe())
   local server_handle, _ =
     assert(vim.loop.spawn(utils.get_data_path() .. fetch.get_typst_bin_name(), {
-      args = { '--root', utils.get_data_path(), file_path },
+      args = { '--root', config.opts.get_root(bufnr), file_path },
       stdio = { nil, server_stdout, server_stderr },
     }))
 
@@ -73,7 +80,7 @@ function M.spawn(on_read, callback)
         utils.debug 'Connecting to server'
         connected = true
         local e, _ = (server_output .. '\n'):find('\n', s + 1)
-        connect(server_output:sub(s + 1, e - 1):gsub("%s+", ""))
+        connect(server_output:sub(s + 1, e - 1):gsub('%s+', ''))
       end
     end
     if server_output then

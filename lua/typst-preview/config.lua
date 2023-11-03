@@ -1,6 +1,7 @@
 local M = {
   opts = {
     debug = false,
+    get_root = vim.fn.getcwd,
   },
 }
 

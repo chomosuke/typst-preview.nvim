@@ -21,14 +21,14 @@ local close = {}
 ---@param bufnr integer
 function M.watch(bufnr)
   local server_buf = ''
-  server.spawn(function(data)
+  server.spawn(bufnr, function(data)
     -- TODO: respond to preview scroll.
   end, function(close_server, write)
     local function on_change()
       utils.debug('updating buffer: ' .. bufnr)
       write(
         '{"event":"updateMemoryFiles","files":{"'
-          .. escape_str(server.get_dummy_path())
+          .. escape_str(server.get_buffer_path(bufnr))
           .. '":"'
           .. escape_str(utils.get_buf_content(bufnr))
           .. '"}}\n'
