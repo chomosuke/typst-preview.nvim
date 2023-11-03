@@ -20,7 +20,6 @@ end
 
 ---Spawn the server and connect to it using the websocat process
 ---@param bufnr integer
----@param on_read function Called when server sends a message, parameter is a string
 ---@param callback function Called after server spawn completes, parameter is
 --(close, write, read_start)
 function M.spawn(bufnr, callback)

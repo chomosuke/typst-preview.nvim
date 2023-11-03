@@ -1,18 +1,9 @@
 local server = require 'typst-preview.server'
 local utils = require 'typst-preview.utils'
+local json = require 'typst-preview.json'
 
 -- Both event from the editor and the previewer
 local M = {}
-
--- taken from https://stackoverflow.com/a/40857186/9069929
-local function escape_str(s)
-  local in_char = { '\\', '"', '/', '\b', '\f', '\n', '\r', '\t' }
-  local out_char = { '\\', '"', '/', 'b', 'f', 'n', 'r', 't' }
-  for i, c in ipairs(in_char) do
-    s = s:gsub(c, '\\' .. out_char[i])
-  end
-  return s
-end
 
 ---Call close[bufnr]() to close preview for bufnr
 local close = {}
@@ -28,13 +19,12 @@ function M.watch(bufnr)
   server.spawn(bufnr, function(close_server, write, read_start)
     local function on_change()
       utils.debug('updating buffer: ' .. bufnr)
-      write(
-        '{"event":"updateMemoryFiles","files":{"'
-          .. escape_str(buf_path)
-          .. '":"'
-          .. escape_str(utils.get_buf_content(bufnr))
-          .. '"}}\n'
-      )
+      write(json.encode {
+        event = 'updateMemoryFiles',
+        files = {
+          [buf_path] = utils.get_buf_content(bufnr),
+        },
+      } .. '\n')
     end
 
     -- So that moving cursor for editorScrollTo does generate panelScrollTo events
@@ -45,51 +35,36 @@ function M.watch(bufnr)
       end
       utils.debug('scrolling: ' .. bufnr)
       local cursor = vim.api.nvim_win_get_cursor(0)
-      write(
-        '{"event":"panelScrollTo","filepath":"'
-          .. escape_str(buf_path)
-          .. '","line":'
-          .. cursor[1] - 1
-          .. ',"character":'
-          .. cursor[2]
-          .. '}\n'
-      )
+      write(json.encode {
+        event = 'panelScrollTo',
+        filepath = buf_path,
+        line = cursor[1] - 1,
+        character = cursor[2],
+      } .. '\n')
     end
 
     read_start(function(data)
       vim.defer_fn(function()
         while data:len() > 0 do
           local s, _ = data:find '\n'
-          local line = data:sub(1, s - 1)
+          local event = json.decode(data:sub(1, s - 1))
           data = data:sub(s + 1, -1)
-          if line:find 'syncEditorChanges' then
-            write(
-              '{"event":"syncMemoryFiles","files":{"'
-                .. escape_str(buf_path)
-                .. '":"'
-                .. escape_str(utils.get_buf_content(bufnr))
-                .. '"}}\n'
-            )
-          elseif line:find 'editorScrollTo' then
-            -- parse json by counting brackets
-            local fst_bra, _ = line:find '%['
-            local fst_com, _ = line:find(',', fst_bra)
-            local fst_ket, _ = line:find('%]', fst_com)
-            local snd_bra, _ = line:find('%[', fst_ket)
-            local snd_com, _ = line:find(',', snd_bra)
-            local snd_ket, _ = line:find('%]', snd_com)
-            local s_row = tonumber(line:sub(fst_bra + 1, fst_com - 1))
-            local s_col = tonumber(line:sub(fst_com + 1, fst_ket - 1))
-            local e_row = tonumber(line:sub(snd_bra + 1, snd_com - 1))
-            local e_col = tonumber(line:sub(snd_com + 1, snd_ket - 1))
+          if event.event == 'syncEditorChanges' then
+            write(json.encode {
+              event = 'syncMemoryFiles',
+              files = {
+                [buf_path] = utils.get_buf_content(bufnr),
+              },
+            } .. '\n')
+          elseif event.event == 'editorScrollTo' then
             local cmd = '<esc>'
-              .. s_row + 1
+              .. event.start[1] + 1
               .. 'G0'
-              .. s_col
+              .. event.start[2]
               .. 'lv'
-              .. e_row + 1
+              .. event['end'][1] + 1
               .. 'G0'
-              .. e_col - 1
+              .. event['end'][2] - 1
               .. 'l'
             utils.debug(cmd)
             suppress_on_scroll = true
