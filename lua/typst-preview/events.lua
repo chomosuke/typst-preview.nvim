@@ -34,17 +34,45 @@ function M.watch(bufnr)
           .. '"}}\n'
       )
     end
-    local function on_editor_scroll() end
 
-    vim.defer_fn(function()
-      on_change()
-    end, 0)
+    local function on_editor_scroll()
+      utils.debug('scrolling: ' .. bufnr)
+      local cursor = vim.api.nvim_win_get_cursor(0)
+      write(
+        '{"event":"panelScrollTo","filepath":"'
+          .. escape_str(server.get_buffer_path(bufnr))
+          .. '","line":'
+          .. cursor[1] - 1
+          .. ',"character":'
+          .. cursor[2]
+          .. '}\n'
+      )
+    end
+
+    local function sync()
+      write(
+        '{"event":"syncMemoryFiles","files":{"'
+          .. escape_str(server.get_buffer_path(bufnr))
+          .. '":"'
+          .. escape_str(utils.get_buf_content(bufnr))
+          .. '"}}\n'
+      )
+    end
+
+    vim.defer_fn(sync, 0)
 
     utils.create_autocmds('typst-preview-autocmds-' .. bufnr, {
       {
         event = { 'TextChanged', 'TextChangedI' },
         opts = {
           callback = on_change,
+          buffer = bufnr,
+        },
+      },
+      {
+        event = { 'CursorMoved', 'CursorMovedI' },
+        opts = {
+          callback = on_editor_scroll,
           buffer = bufnr,
         },
       },
