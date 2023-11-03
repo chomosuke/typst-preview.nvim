@@ -20,6 +20,10 @@ local close = {}
 ---Do all work necessary to start a preview for a buffer.
 ---@param bufnr integer
 function M.watch(bufnr)
+  if bufnr == 0 then
+    bufnr = vim.fn.bufnr()
+  end
+
   local buf_path = server.get_buffer_path(bufnr)
   server.spawn(bufnr, function(close_server, write, read_start)
     local function on_change()
@@ -33,7 +37,12 @@ function M.watch(bufnr)
       )
     end
 
+    -- So that moving cursor for editorScrollTo does generate panelScrollTo events
+    local suppress_on_scroll = false
     local function on_editor_scroll()
+      if suppress_on_scroll then
+        return
+      end
       utils.debug('scrolling: ' .. bufnr)
       local cursor = vim.api.nvim_win_get_cursor(0)
       write(
@@ -61,8 +70,33 @@ function M.watch(bufnr)
                 .. escape_str(utils.get_buf_content(bufnr))
                 .. '"}}\n'
             )
-          elseif line:find '' then
-            -- TODO: respond to preview scroll.
+          elseif line:find 'editorScrollTo' then
+            -- parse json by counting brackets
+            local fst_bra, _ = line:find '%['
+            local fst_com, _ = line:find(',', fst_bra)
+            local fst_ket, _ = line:find('%]', fst_com)
+            local snd_bra, _ = line:find('%[', fst_ket)
+            local snd_com, _ = line:find(',', snd_bra)
+            local snd_ket, _ = line:find('%]', snd_com)
+            local s_row = tonumber(line:sub(fst_bra + 1, fst_com - 1))
+            local s_col = tonumber(line:sub(fst_com + 1, fst_ket - 1))
+            local e_row = tonumber(line:sub(snd_bra + 1, snd_com - 1))
+            local e_col = tonumber(line:sub(snd_com + 1, snd_ket - 1))
+            local cmd = '<esc>'
+              .. s_row + 1
+              .. 'G0'
+              .. s_col
+              .. 'lv'
+              .. e_row + 1
+              .. 'G0'
+              .. e_col - 1
+              .. 'l'
+            utils.debug(cmd)
+            suppress_on_scroll = true
+            vim.api.nvim_input(cmd)
+            vim.defer_fn(function()
+              suppress_on_scroll = false
+            end, 100)
           end
         end
       end, 0)
