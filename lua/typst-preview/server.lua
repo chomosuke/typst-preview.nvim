@@ -1,7 +1,7 @@
--- Responsible for starting, stopping and communicating with the server
 local fetch = require 'typst-preview.fetch'
 local utils = require 'typst-preview.utils'
 
+-- Responsible for starting, stopping and communicating with the server
 local M = {}
 
 ---Source of truth for dummy file path

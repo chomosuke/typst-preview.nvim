@@ -1,20 +1,21 @@
 local server = require 'typst-preview.server'
 local utils = require 'typst-preview.utils'
+
 -- Both event from the editor and the previewer
 local M = {}
 
----Call close[bufnr]() to close preview for bufnr
-local close = {}
-
 -- taken from https://stackoverflow.com/a/40857186/9069929
 local function escape_str(s)
-  local in_char  = {'\\', '"', '/', '\b', '\f', '\n', '\r', '\t'}
-  local out_char = {'\\', '"', '/',  'b',  'f',  'n',  'r',  't'}
+  local in_char = { '\\', '"', '/', '\b', '\f', '\n', '\r', '\t' }
+  local out_char = { '\\', '"', '/', 'b', 'f', 'n', 'r', 't' }
   for i, c in ipairs(in_char) do
     s = s:gsub(c, '\\' .. out_char[i])
   end
   return s
 end
+
+---Call close[bufnr]() to close preview for bufnr
+local close = {}
 
 ---Do all work necessary to start a preview for a buffer.
 ---@param bufnr integer

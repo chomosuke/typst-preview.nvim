@@ -1,7 +1,7 @@
 local utils = require 'typst-preview.utils'
+
 -- Responsible for downloading all required binary.
 -- Currently includes typst-preview and websocat
-
 local M = {
   -- Exposing this so when platform detection fails user can manually set
   -- bin_name

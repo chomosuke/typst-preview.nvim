@@ -1,3 +1,4 @@
+local config = require "typst-preview.config"
 local M = {}
 
 ---Get the path to store all persistent datas
@@ -37,10 +38,10 @@ function M.print(data)
   end, 0)
 end
 
----print that only work when debug = true
+---print that only work when opts.debug = true
 ---@param data string
 function M.debug(data)
-  if true then
+  if config.opts.debug then
     M.print(data)
   end
 end
