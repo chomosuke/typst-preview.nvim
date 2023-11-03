@@ -1,3 +1,4 @@
+local utils = require 'typst-preview.utils'
 -- Responsible for downloading all required binary.
 -- Currently includes typst-preview and websocat
 
@@ -21,6 +22,7 @@ function M.is_linux()
 end
 
 -- Stolen from mason.nvim
+
 function M.is_x64()
   local machine = vim.loop.os_uname().machine
   return machine == 'x86_64' or machine == 'x64'
@@ -52,7 +54,7 @@ local function get_bin_name(map)
   end
 
   if os == nil or machine == nil or map[os][machine] == nil then
-    vim.notify(
+    utils.notify(
       "typst-preview can't figure out your platform.\n"
         .. 'Please report this bug.\n'
         .. 'os_uname: '
@@ -64,6 +66,8 @@ local function get_bin_name(map)
   return map[os][machine]
 end
 
+---Get name of typst-preview binary, this is also the name for the github asset to download.
+---@return string name
 function M.get_typst_bin_name()
   if M.typst_bin_name == nil then
     M.typst_bin_name = get_bin_name {
@@ -84,6 +88,8 @@ function M.get_typst_bin_name()
   return M.typst_bin_name
 end
 
+---Get name of websocat binary, this is also the name for the github asset to download.
+---@return string name
 function M.get_websocat_bin_name()
   if M.websocat_bin_name == nil then
     M.websocat_bin_name = get_bin_name {
@@ -103,25 +109,18 @@ function M.get_websocat_bin_name()
   return M.websocat_bin_name
 end
 
-function M.get_bin_path()
-  return vim.fn.fnamemodify(vim.fn.stdpath 'data' .. '/typst-preview/', ':p')
-end
-
 local function download_bin(url, name, callback)
-  local path = M.get_bin_path() .. name
+  local path = utils.get_data_path() .. name
   local stdin = nil
-  local stdout = vim.loop.new_pipe()
-  local stderr = vim.loop.new_pipe()
-  if stdout == nil or stderr == nil then
-    error "typst-preview can't create pipe!"
-  end
+  local stdout = assert(vim.loop.new_pipe())
+  local stderr = assert(vim.loop.new_pipe())
   -- TODO add wget support
   vim.loop.spawn('curl', {
     args = { '-L', url, '--create-dirs', '--output', path, '--progress-bar' },
     stdio = { stdin, stdout, stderr },
   }, function(code, _)
     if code ~= 0 then
-      vim.notify(
+      utils.notify(
         'Downloading ' .. name .. ' binary failed, exit code: ' .. code
       )
     else
@@ -141,19 +140,25 @@ local function download_bin(url, name, callback)
       while progress:len() < 6 do
         progress = ' ' .. progress
       end
-      print('Downloading ' .. name .. 'binary ' .. progress)
+      utils.print('Downloading ' .. name .. progress)
     end
   end
   stdout:read_start(read_progress)
   stderr:read_start(read_progress)
 end
 
+---Download all binaries and other needed artifact to utils.get_data_path()
+---@param callback function|nil
 function M.fetch(callback)
+  if callback == nil then
+    callback = function() end
+  end
   local function finish()
-    print(
+    utils.notify(
       'all binary downloaded to '
-        .. M.get_bin_path()
-        .. '\nYou may want to manually delete it if uninstalling typst-preview.nvim'
+        .. utils.get_data_path()
+        .. '\nYou may want to manually delete it if uninstalling typst-preview.nvim',
+      vim.log.levels.INFO
     )
     callback()
   end
@@ -165,7 +170,7 @@ function M.fetch(callback)
     M.get_typst_bin_name(),
     function()
       download_bin(
-        'https://github.com/Enter-tainer/typst-preview/releases/latest/download/'
+        'https://github.com/vi/websocat/releases/latest/download/'
           .. M.get_websocat_bin_name(),
         M.get_websocat_bin_name(),
         finish
