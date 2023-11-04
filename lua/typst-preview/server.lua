@@ -28,7 +28,17 @@ function M.spawn(bufnr, callback)
   local server_stderr = assert(vim.loop.new_pipe())
   local server_handle, _ =
     assert(vim.loop.spawn(utils.get_data_path() .. fetch.get_typst_bin_name(), {
-      args = { '--root', config.opts.get_root(bufnr), file_path },
+      args = {
+        '--data-plane-host',
+        '127.0.0.1:0',
+        '--control-plane-host',
+        '127.0.0.1:0',
+        '--static-file-host',
+        '127.0.0.1:0',
+        '--root',
+        config.opts.get_root(bufnr),
+        file_path,
+      },
       stdio = { nil, server_stdout, server_stderr },
     }))
 

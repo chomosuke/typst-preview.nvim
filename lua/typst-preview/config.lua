@@ -1,7 +1,9 @@
 local M = {
   opts = {
     debug = false,
-    get_root = vim.fn.getcwd,
+    get_root = function(_)
+      return vim.fn.getcwd()
+    end,
   },
 }
 

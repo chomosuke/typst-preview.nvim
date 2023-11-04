@@ -11,6 +11,8 @@ local close = {}
 ---Do all work necessary to start a preview for a buffer.
 ---@param bufnr integer
 function M.watch(bufnr)
+  utils.debug('Watching buffer: ' .. bufnr)
+
   if bufnr == 0 then
     bufnr = vim.fn.bufnr()
   end
