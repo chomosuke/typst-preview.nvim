@@ -31,18 +31,23 @@ function M.watch(bufnr)
 
     -- So that moving cursor for editorScrollTo does generate panelScrollTo events
     local suppress_on_scroll = false
+    local last_line
     local function on_editor_scroll()
       if suppress_on_scroll then
         return
       end
       utils.debug('scrolling: ' .. bufnr)
       local cursor = vim.api.nvim_win_get_cursor(0)
-      write(json.encode {
-        event = 'panelScrollTo',
-        filepath = buf_path,
-        line = cursor[1] - 1,
-        character = cursor[2],
-      } .. '\n')
+      local line = cursor[1] - 1
+      if last_line ~= line then
+        last_line = line
+        write(json.encode {
+          event = 'panelScrollTo',
+          filepath = buf_path,
+          line = line,
+          character = cursor[2],
+        } .. '\n')
+      end
     end
 
     read_start(function(data)

@@ -1,5 +1,6 @@
 local events = require 'typst-preview.events'
 local fetch = require 'typst-preview.fetch'
+local utils = require 'typst-preview.utils'
 
 local M = {}
 
@@ -10,12 +11,16 @@ function M.create_commands()
     if not previewing[vim.fn.bufnr()] then
       previewing[vim.fn.bufnr()] = true
       events.watch(vim.fn.bufnr())
+    else
+      utils.print('Already previewing') -- TODO: open another front end to the same preview.
     end
   end
   local function preview_off()
     if previewing[vim.fn.bufnr()] then
       previewing[vim.fn.bufnr()] = false
       events.stop(vim.fn.bufnr())
+    else
+      utils.print('Preview not running')
     end
   end
   vim.api.nvim_create_user_command('TypstPreview', preview_on, {})
