@@ -165,12 +165,12 @@ function M.fetch(callback)
 
   -- from https://docs.github.com/en/repositories/releasing-projects-on-github/linking-to-releases
   download_bin(
-    'https://github.com/Enter-tainer/typst-preview/releases/latest/download/'
+    'https://github.com/Enter-tainer/typst-preview/releases/download/v0.9.0/'
       .. M.get_typst_bin_name(),
     M.get_typst_bin_name(),
     function()
       download_bin(
-        'https://github.com/vi/websocat/releases/latest/download/'
+        'https://github.com/vi/websocat/releases/download/v1.12.0/'
           .. M.get_websocat_bin_name(),
         M.get_websocat_bin_name(),
         finish
