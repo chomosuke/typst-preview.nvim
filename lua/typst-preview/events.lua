@@ -32,14 +32,16 @@ function M.watch(bufnr)
     -- So that moving cursor for editorScrollTo does generate panelScrollTo events
     local suppress_on_scroll = false
     local last_line
-    local function on_editor_scroll()
+    local function on_editor_scroll(ev)
       if suppress_on_scroll then
         return
       end
       utils.debug('scrolling: ' .. bufnr)
       local cursor = vim.api.nvim_win_get_cursor(0)
       local line = cursor[1] - 1
-      if last_line ~= line then
+      utils.debug(vim.inspect(ev))
+      if last_line ~= line or ev.event ~= 'CursorMovedI' then
+        -- No scroll when on the same line in insert mode
         last_line = line
         write(json.encode {
           event = 'panelScrollTo',
