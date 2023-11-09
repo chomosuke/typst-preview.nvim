@@ -12,7 +12,7 @@ function M.create_commands()
       previewing[vim.fn.bufnr()] = true
       events.watch(vim.fn.bufnr())
     else
-      utils.print('Already previewing') -- TODO: open another front end to the same preview.
+      utils.print 'Already previewing' -- TODO: open another front end to the same preview.
     end
   end
   local function preview_off()
@@ -20,7 +20,7 @@ function M.create_commands()
       previewing[vim.fn.bufnr()] = false
       events.stop(vim.fn.bufnr())
     else
-      utils.print('Preview not running')
+      utils.print 'Preview not running'
     end
   end
   vim.api.nvim_create_user_command('TypstPreview', preview_on, {})
@@ -32,7 +32,9 @@ function M.create_commands()
       preview_on()
     end
   end, {})
-  vim.api.nvim_create_user_command('TypstPreviewUpdate', fetch.fetch, {})
+  vim.api.nvim_create_user_command('TypstPreviewUpdate', function()
+    fetch.fetch()
+  end, {})
 end
 
 return M

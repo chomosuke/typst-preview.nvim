@@ -39,7 +39,6 @@ function M.watch(bufnr)
       utils.debug('scrolling: ' .. bufnr)
       local cursor = vim.api.nvim_win_get_cursor(0)
       local line = cursor[1] - 1
-      utils.debug(vim.inspect(ev))
       if last_line ~= line or ev.event ~= 'CursorMovedI' then
         -- No scroll when on the same line in insert mode
         last_line = line
@@ -66,15 +65,15 @@ function M.watch(bufnr)
               },
             } .. '\n')
           elseif event.event == 'editorScrollTo' then
-            local cmd = '<esc>'
-              .. event.start[1] + 1
-              .. 'G0'
-              .. event.start[2]
-              .. 'lv'
-              .. event['end'][1] + 1
-              .. 'G0'
-              .. event['end'][2] - 1
-              .. 'l'
+            local cmd = '<esc>' .. event.start[1] + 1 .. 'G0'
+            if event.start[2] > 0 then
+              cmd = cmd .. event.start[2] .. 'l'
+            end
+            cmd = cmd .. 'v' .. event['end'][1] + 1 .. 'G0'
+            if event['end'][2] - 1 > 0 then
+              cmd = cmd .. event['end'][2] - 1 .. 'l'
+            end
+
             utils.debug(cmd)
             suppress_on_scroll = true
             vim.api.nvim_input(cmd)
