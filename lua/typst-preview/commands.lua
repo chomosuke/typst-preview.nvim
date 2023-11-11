@@ -6,13 +6,39 @@ local M = {}
 
 local previewing = {}
 
+local open_cmd
+if fetch.is_macos() then
+  open_cmd = 'open'
+elseif
+  fetch.is_windows()
+  or (fetch.is_linux() and vim.loop.os_uname().release:lower():find 'microsoft')
+then
+  open_cmd = 'cmd.exe /c start ""'
+else
+  open_cmd = 'xdg-open'
+end
+
+local function visit(link)
+  vim.fn.jobstart(string.format('%s %s', open_cmd, link), {
+    on_stderr = function(_, data)
+      local msg = table.concat(data or {}, '\n')
+      if msg ~= '' then
+        print('typst-preview opening link failed: ' .. msg)
+      end
+    end,
+  })
+end
+
 function M.create_commands()
   local function preview_on()
     if not previewing[vim.fn.bufnr()] then
       previewing[vim.fn.bufnr()] = true
-      events.watch(vim.fn.bufnr())
-    else
-      utils.print 'Already previewing' -- TODO: open another front end to the same preview.
+      events.watch(vim.fn.bufnr(), function(link)
+        previewing[vim.fn.bufnr()] = link
+      end)
+    elseif type(previewing[vim.fn.bufnr()]) == 'string' then
+      utils.debug 'Opening another fontend'
+      visit(previewing[vim.fn.bufnr()])
     end
   end
   local function preview_off()

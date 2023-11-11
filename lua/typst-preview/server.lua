@@ -22,7 +22,8 @@ end
 ---@param bufnr integer
 ---@param callback function Called after server spawn completes, parameter is
 --(close, write, read_start)
-function M.spawn(bufnr, callback)
+---@param set_link function
+function M.spawn(bufnr, callback, set_link)
   local file_path = M.get_buffer_path(bufnr)
   local server_stdout = assert(vim.loop.new_pipe())
   local server_stderr = assert(vim.loop.new_pipe())
@@ -80,16 +81,29 @@ function M.spawn(bufnr, callback)
   end
 
   local connected = false
+  local function find_host(server_output, prompt)
+    local _, s = server_output:find(prompt)
+    if s then
+      local e, _ = (server_output .. '\n'):find('\n', s + 1)
+      return server_output:sub(s + 1, e - 1):gsub('%s+', '')
+    end
+  end
   local function read_server(serr, server_output)
     if serr then
       error(serr)
-    elseif server_output and not connected then
-      local _, s = server_output:find 'Control plane server listening on: '
-      if s then
+    elseif server_output then
+      local control_host =
+        find_host(server_output, 'Control plane server listening on: ')
+      local static_host =
+        find_host(server_output, 'Static file server listening on: ')
+      if control_host and not connected then
         utils.debug 'Connecting to server'
         connected = true
-        local e, _ = (server_output .. '\n'):find('\n', s + 1)
-        connect(server_output:sub(s + 1, e - 1):gsub('%s+', ''))
+        connect(control_host)
+      end
+      if static_host then
+        utils.debug('Setting link')
+        vim.defer_fn(function() set_link(static_host) end, 0)
       end
     end
     if server_output then

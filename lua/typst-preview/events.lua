@@ -10,7 +10,8 @@ local close = {}
 
 ---Do all work necessary to start a preview for a buffer.
 ---@param bufnr integer
-function M.watch(bufnr)
+---@param set_link function
+function M.watch(bufnr, set_link)
   utils.debug('Watching buffer: ' .. bufnr)
 
   if bufnr == 0 then
@@ -112,7 +113,7 @@ function M.watch(bufnr)
     })
 
     close[bufnr] = close_server
-  end)
+  end, set_link)
 end
 
 function M.stop(bufnr)
