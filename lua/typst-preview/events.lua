@@ -8,6 +8,42 @@ local M = {}
 ---Call close[bufnr]() to close preview for bufnr
 local close = {}
 
+local on_changes = {}
+
+local function watch_buf_change(bufnr)
+  utils.create_autocmds('typst-preview-autocmds-on-change-' .. bufnr, {
+    {
+      event = { 'TextChanged', 'TextChangedI' },
+      opts = {
+        callback = function()
+          for _, on_change in pairs(on_changes) do
+            on_change(bufnr)
+          end
+        end,
+        buffer = bufnr,
+      },
+    },
+  })
+end
+
+utils.create_autocmds('typst-preview-autocmds-filetype-init', {
+  {
+    event = 'FileType',
+    opts = {
+      callback = function(ev)
+        watch_buf_change(ev.buf)
+      end,
+      pattern = 'typst',
+    },
+  },
+})
+
+for _, bufnr in pairs(vim.api.nvim_list_bufs()) do
+  if vim.bo[bufnr].filetype == 'typst' then
+    watch_buf_change(bufnr)
+  end
+end
+
 ---Do all work necessary to start a preview for a buffer.
 ---@param bufnr integer
 ---@param set_link function
@@ -20,12 +56,14 @@ function M.watch(bufnr, set_link)
 
   local buf_path = server.get_buffer_path(bufnr)
   server.spawn(bufnr, function(close_server, write, read_start)
-    local function on_change()
-      utils.debug('updating buffer: ' .. bufnr)
+    local function on_change(changed_bufnr)
+      utils.debug('updating buffer: ' .. changed_bufnr)
       write(json.encode {
         event = 'updateMemoryFiles',
         files = {
-          [buf_path] = utils.get_buf_content(bufnr),
+          [utils.get_buf_path(changed_bufnr)] = utils.get_buf_content(
+            changed_bufnr
+          ),
         },
       } .. '\n')
     end
@@ -86,14 +124,8 @@ function M.watch(bufnr, set_link)
       end, 0)
     end)
 
+    on_changes[bufnr] = on_change
     utils.create_autocmds('typst-preview-autocmds-' .. bufnr, {
-      {
-        event = { 'TextChanged', 'TextChangedI' },
-        opts = {
-          callback = on_change,
-          buffer = bufnr,
-        },
-      },
       {
         event = { 'CursorMoved', 'CursorMovedI' },
         opts = {
@@ -119,6 +151,7 @@ end
 function M.stop(bufnr)
   utils.debug 'Server closed'
   close[bufnr]()
+  on_changes[bufnr] = nil
 end
 
 return M

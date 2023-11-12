@@ -37,7 +37,7 @@ function M.create_commands()
         previewing[vim.fn.bufnr()] = link
       end)
     elseif type(previewing[vim.fn.bufnr()]) == 'string' then
-      utils.debug 'Opening another fontend'
+      print 'Opening another fontend'
       visit(previewing[vim.fn.bufnr()])
     end
   end
@@ -49,6 +49,7 @@ function M.create_commands()
       utils.print 'Preview not running'
     end
   end
+  -- TODO check if binaries are available and tell them to fetch first
   vim.api.nvim_create_user_command('TypstPreview', preview_on, {})
   vim.api.nvim_create_user_command('TypstPreviewStop', preview_off, {})
   vim.api.nvim_create_user_command('TypstPreviewToggle', function()
@@ -61,6 +62,7 @@ function M.create_commands()
   vim.api.nvim_create_user_command('TypstPreviewUpdate', function()
     fetch.fetch()
   end, {})
+  -- TODO ability stop scrolling
 end
 
 return M
