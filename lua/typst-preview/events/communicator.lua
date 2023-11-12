@@ -1,13 +1,12 @@
-
-local M = {}
-
 ---@class Comm
 ---@field close function
 ---@field write function
 ---@field listeners function[]
 
----@type Comm[]
-M.comms = {}
+local M = {
+  ---@type Comm[]
+  comms = {}
+}
 
 ---@return Comm comm
 function M.new(close_server, write, read_start)

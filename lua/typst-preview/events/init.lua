@@ -3,11 +3,11 @@ local utils = require 'typst-preview.utils'
 local communicator = require 'typst-preview.events.communicator'
 
 -- Both event from the editor and the previewer
-local M = {}
-
--- Just another ugly global variable
--- So that moving cursor for editorScrollTo doesn't generate panelScrollTo events
-M.suppress_on_scroll = false
+local M = {
+  -- Just another ugly global variable
+  -- So that moving cursor for editorScrollTo doesn't generate panelScrollTo events
+  suppress_on_scroll = false,
+}
 
 ---Do all work necessary to start a preview for a buffer.
 ---@param bufnr integer
@@ -33,23 +33,30 @@ function M.watch(bufnr, set_link)
     end)
 
     communicator.addListener(comm, 'editorScrollTo', function(event)
-      -- jump buffer
+      local function select()
+        local cmd = '<esc>' .. event.start[1] + 1 .. 'G0'
+        if event.start[2] > 0 then
+          cmd = cmd .. event.start[2] .. 'l'
+        end
+        cmd = cmd .. 'v' .. event['end'][1] + 1 .. 'G0'
+        if event['end'][2] - 1 > 0 then
+          cmd = cmd .. event['end'][2] - 1 .. 'l'
+        end
 
-      local cmd = '<esc>' .. event.start[1] + 1 .. 'G0'
-      if event.start[2] > 0 then
-        cmd = cmd .. event.start[2] .. 'l'
-      end
-      cmd = cmd .. 'v' .. event['end'][1] + 1 .. 'G0'
-      if event['end'][2] - 1 > 0 then
-        cmd = cmd .. event['end'][2] - 1 .. 'l'
+        utils.debug(cmd)
+        M.suppress_on_scroll = true
+        vim.api.nvim_input(cmd)
+        vim.defer_fn(function()
+          M.suppress_on_scroll = false
+        end, 100)
       end
 
-      utils.debug(cmd)
-      M.suppress_on_scroll = true
-      vim.api.nvim_input(cmd)
-      vim.defer_fn(function()
-        M.suppress_on_scroll = false
-      end, 100)
+      if event.filepath ~= vim.api.nvim_buf_get_name(0) then
+        vim.cmd('e ' .. event.filepath)
+        vim.defer_fn(select, 100)
+      else
+        select()
+      end
     end)
 
     utils.create_autocmds('typst-preview-autocmds-unload-' .. bufnr, {
