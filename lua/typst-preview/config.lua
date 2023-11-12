@@ -7,7 +7,7 @@ local M = {
   },
 }
 
-function M.setup(opts)
+function M.config(opts)
   M.opts = vim.tbl_deep_extend('force', M.opts, opts or {})
 end
 
