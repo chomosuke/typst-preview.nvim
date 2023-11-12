@@ -58,18 +58,6 @@ function M.watch(bufnr, set_link)
         select()
       end
     end)
-
-    utils.create_autocmds('typst-preview-autocmds-unload-' .. bufnr, {
-      {
-        event = 'BufUnload',
-        opts = {
-          callback = function()
-            M.stop(bufnr)
-          end,
-          buffer = bufnr,
-        },
-      },
-    })
   end, set_link)
 end
 

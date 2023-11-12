@@ -30,25 +30,41 @@ local function visit(link)
 end
 
 function M.create_commands()
-  local function preview_on()
-    if not previewing[vim.fn.bufnr()] then
-      previewing[vim.fn.bufnr()] = true
-      events.watch(vim.fn.bufnr(), function(link)
-        previewing[vim.fn.bufnr()] = link
-      end)
-    elseif type(previewing[vim.fn.bufnr()]) == 'string' then
-      print 'Opening another fontend'
-      visit(previewing[vim.fn.bufnr()])
-    end
-  end
+  local bufnr = vim.fn.bufnr()
+
   local function preview_off()
-    if previewing[vim.fn.bufnr()] then
-      previewing[vim.fn.bufnr()] = false
-      events.stop(vim.fn.bufnr())
+    if previewing[bufnr] then
+      previewing[bufnr] = false
+      events.stop(bufnr)
     else
       utils.print 'Preview not running'
     end
   end
+
+  local function preview_on()
+    if not previewing[bufnr] then
+      utils.create_autocmds('typst-preview-autocmds-unload-' .. bufnr, {
+        {
+          event = 'BufUnload',
+          opts = {
+            callback = function()
+              -- preview_off is the source of truth of cleaning up everything.
+              preview_off()
+            end,
+            buffer = bufnr,
+          },
+        },
+      })
+      previewing[bufnr] = true
+      events.watch(bufnr, function(link)
+        previewing[bufnr] = link
+      end)
+    elseif type(previewing[bufnr]) == 'string' then
+      print 'Opening another fontend'
+      visit(previewing[bufnr])
+    end
+  end
+
   -- TODO check if binaries are available and tell them to fetch first
   vim.api.nvim_create_user_command('TypstPreview', preview_on, {})
   vim.api.nvim_create_user_command('TypstPreviewStop', preview_off, {})
