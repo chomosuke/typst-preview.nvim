@@ -31,9 +31,8 @@ local function visit(link)
 end
 
 function M.create_commands()
-  local bufnr = vim.fn.bufnr()
-
-  local function preview_off()
+  local function preview_off(bufnr)
+    bufnr = bufnr or vim.fn.bufnr()
     if previewing[bufnr] then
       previewing[bufnr] = false
       events.stop(bufnr)
@@ -43,6 +42,7 @@ function M.create_commands()
   end
 
   local function preview_on()
+    local bufnr = vim.fn.bufnr()
     -- check if binaries are available and tell them to fetch first
     for _, bin in pairs(fetch.bins_to_fetch()) do
       if fetch.up_to_date(bin.name) then
@@ -61,7 +61,7 @@ function M.create_commands()
           opts = {
             callback = function()
               -- preview_off is the source of truth of cleaning up everything.
-              preview_off()
+              preview_off(bufnr)
             end,
             buffer = bufnr,
           },
@@ -80,7 +80,9 @@ function M.create_commands()
   vim.api.nvim_create_user_command('TypstPreviewUpdate', init.update, {})
 
   vim.api.nvim_create_user_command('TypstPreview', preview_on, {})
-  vim.api.nvim_create_user_command('TypstPreviewStop', preview_off, {})
+  vim.api.nvim_create_user_command('TypstPreviewStop', function()
+    preview_off()
+  end, {})
   vim.api.nvim_create_user_command('TypstPreviewToggle', function()
     if previewing[vim.fn.bufnr()] then
       preview_off()
