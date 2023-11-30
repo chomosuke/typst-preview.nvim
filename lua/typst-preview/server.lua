@@ -102,8 +102,10 @@ function M.spawn(bufnr, callback, set_link)
         connect(control_host)
       end
       if static_host then
-        utils.debug('Setting link')
-        vim.defer_fn(function() set_link(static_host) end, 0)
+        utils.debug 'Setting link'
+        vim.defer_fn(function()
+          set_link(static_host)
+        end, 0)
       end
     end
     if server_output then

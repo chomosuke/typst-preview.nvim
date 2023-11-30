@@ -109,16 +109,18 @@ function M.get_websocat_bin_name()
   return M.websocat_bin_name
 end
 
-local function get_path(name)
+function M.get_path(name)
   return utils.get_data_path() .. name
 end
 
 local function download_bin(url, name, callback)
-  local path = get_path(name)
+  local path = M.get_path(name)
   if utils.file_exist(path) then
-    utils.notify(
-      name .. ' already exits, to redownload, please manually delete: ' .. path .. '\n\n',
-      vim.log.levels.INFO
+    print(
+      name
+        .. ' already exits, to redownload, please manually delete: '
+        .. path
+        .. '\n\n'
     )
     callback()
     return
@@ -163,12 +165,12 @@ end
 function M.bins_to_fetch()
   return {
     {
-      path = 'https://github.com/Enter-tainer/typst-preview/releases/download/v0.9.0/'
+      url = 'https://github.com/Enter-tainer/typst-preview/releases/download/v0.9.0/'
         .. M.get_typst_bin_name(),
       name = M.get_typst_bin_name(),
     },
     {
-      path = 'https://github.com/vi/websocat/releases/download/v1.12.0/'
+      url = 'https://github.com/vi/websocat/releases/download/v1.12.0/'
         .. M.get_websocat_bin_name(),
       name = M.get_websocat_bin_name(),
     },
@@ -182,11 +184,10 @@ function M.fetch(callback)
     callback = function() end
   end
   local function finish()
-    utils.notify(
-      'all binary downloaded to '
+    print(
+      'All binary downloaded to '
         .. utils.get_data_path()
-        .. '\nYou may want to manually delete it if uninstalling typst-preview.nvim',
-      vim.log.levels.INFO
+        .. '\nYou may want to manually delete it if uninstalling typst-preview.nvim'
     )
     callback()
   end
@@ -197,7 +198,7 @@ function M.fetch(callback)
       return
     end
     local bin = table.remove(bins, 1)
-    download_bin(bin.path, bin.name, function()
+    download_bin(bin.url, bin.name, function()
       download_bins(bins, finish)
     end)
   end

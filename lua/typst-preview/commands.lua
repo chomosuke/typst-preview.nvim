@@ -1,6 +1,7 @@
 local events = require 'typst-preview.events'
 local fetch = require 'typst-preview.fetch'
 local utils = require 'typst-preview.utils'
+local init = require 'typst-preview.init'
 
 local M = {}
 
@@ -42,6 +43,18 @@ function M.create_commands()
   end
 
   local function preview_on()
+    -- check if binaries are available and tell them to fetch first
+    for _, bin in pairs(fetch.bins_to_fetch()) do
+      local path = fetch.get_path(bin.name)
+      if not utils.file_exist(path) then
+        utils.notify(
+          path .. ' not found\nPlease run :TypstPreviewUpdate first!',
+          vim.log.levels.ERROR
+        )
+      end
+      return
+    end
+
     if not previewing[bufnr] then
       utils.create_autocmds('typst-preview-autocmds-unload-' .. bufnr, {
         {
@@ -65,7 +78,8 @@ function M.create_commands()
     end
   end
 
-  -- TODO check if binaries are available and tell them to fetch first
+  vim.api.nvim_create_user_command('TypstPreviewUpdate', init.update, {})
+
   vim.api.nvim_create_user_command('TypstPreview', preview_on, {})
   vim.api.nvim_create_user_command('TypstPreviewStop', preview_off, {})
   vim.api.nvim_create_user_command('TypstPreviewToggle', function()
