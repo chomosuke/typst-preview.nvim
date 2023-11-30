@@ -2,7 +2,10 @@
 
 The Neovim plugin for [Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview).
 
-<!-- *insert screen recording here* -->
+
+https://github.com/chomosuke/typst-preview.nvim/assets/38484873/9f8ecf0f-aa1c-4edb-85a9-96a8005e8f25
+
+
 
 ## 💪 Features
 
