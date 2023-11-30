@@ -68,7 +68,7 @@ Plug 'chomosuke/typst-preview.nvim', {'tag': 'v1.*', do: ':TypstPreviewUpdate'}
     `:TypstPreviewNoFollowCursor` so that the preview only scroll to the current cursor position
     when you want it to.
 
-## ⚙️  Configuration
+## ⚙️ Configuration
 
 This plugin should work out of the box with no configuration. Call to `setup()` is not required.
 
@@ -97,3 +97,7 @@ good comparison [here](https://enter-tainer.github.io/typst-preview/intro.html#l
   [here](https://enter-tainer.github.io/typst-preview/intro.html#loc-1x0.00x1600.00):
   - Higher latency due to the PDF reader having a delay.
   - Does not support cross jump between code and preview.
+
+## 💻 Contribution
+
+All PRs are welcome.
