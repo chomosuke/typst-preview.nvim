@@ -89,10 +89,19 @@ function M.create_commands()
       preview_on()
     end
   end, {})
-  vim.api.nvim_create_user_command('TypstPreviewUpdate', function()
-    fetch.fetch()
+
+  vim.api.nvim_create_user_command('TypstPreviewFollowCursor', function()
+    init.set_follow_cursor(true)
   end, {})
-  -- TODO ability stop scrolling
+  vim.api.nvim_create_user_command('TypstPreviewNoFollowCursor', function()
+    init.set_follow_cursor(false)
+  end, {})
+  vim.api.nvim_create_user_command('TypstPreviewFollowCursorToggle', function()
+    init.set_follow_cursor(not init.get_follow_cursor())
+  end, {})
+  vim.api.nvim_create_user_command('TypstPreviewSyncCursor', function()
+    init.sync_with_cursor()
+  end, {})
 end
 
 return M
