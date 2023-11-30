@@ -4,6 +4,13 @@ The Neovim plugin for [Enter-tainer/typst-preview](https://github.com/Enter-tain
 
 <!-- *insert screen recording here* -->
 
+## 💪 Features
+
+- Low latency preview: preview your document instantly on type. The incremental rendering technique
+  makes the preview latency as low as possible.
+- Cross jump between code and preview. You can click on the preview to jump to the
+  corresponding code location and have the preview follow your cursor in Neovim.
+
 ## 📦 Installation
 
 **Lazy.nvim:**
@@ -61,7 +68,7 @@ Plug 'chomosuke/typst-preview.nvim', {'tag': 'v1.*', do: ':TypstPreviewUpdate'}
     `:TypstPreviewNoFollowCursor` so that the preview only scroll to the current cursor position
     when you want it to.
 
-## ⚙️ Configuration
+## ⚙️  Configuration
 
 This plugin should work out of the box with no configuration. Call to `setup()` is not required.
 
@@ -79,20 +86,13 @@ require 'typst-preview'.setup {
 }
 ```
 
-## 💪 Features
-
-- Low latency preview: preview your document instantly on type. The incremental rendering technique
-  makes the preview latency as low as possible.
-- Cross jump between code and preview. You can click on the preview to jump to the
-  corresponding code location and have the preview follow your cursor in Neovim.
-
-### Comparison with other tools
+## ❓ Comparison with other tools
 
 The author of [Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview) wrote a
 good comparison [here](https://enter-tainer.github.io/typst-preview/intro.html#loc-1x0.00x949.99).
 
 - [niuiic/typst-preview.nvim](https://github.com/niuiic/typst-preview.nvim): Since this uses
-  [typst-lsp](https://github.com/nvarner/typst-lsp) in the background it has similar advantages and
+  [typst-lsp](https://github.com/nvarner/typst-lsp), it has similar advantages and
   disadvantages of typst-lsp mentioned
   [here](https://enter-tainer.github.io/typst-preview/intro.html#loc-1x0.00x1600.00):
   - Higher latency due to the PDF reader having a delay.
