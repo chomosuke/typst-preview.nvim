@@ -1,5 +1,17 @@
-local config = require "typst-preview.config"
+local config = require 'typst-preview.config'
 local M = {}
+
+---check if a file exist
+---@param path string
+function M.file_exist(path)
+  local f = io.open(path, 'r')
+  if f ~= nil then
+    io.close(f)
+    return true
+  else
+    return false
+  end
+end
 
 ---Get the path to store all persistent datas
 ---@return string path

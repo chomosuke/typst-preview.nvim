@@ -109,8 +109,21 @@ function M.get_websocat_bin_name()
   return M.websocat_bin_name
 end
 
+local function get_path(name)
+  return utils.get_data_path() .. name
+end
+
 local function download_bin(url, name, callback)
-  local path = utils.get_data_path() .. name
+  local path = get_path(name)
+  if utils.file_exist(path) then
+    utils.notify(
+      name .. ' already exits, to redownload, please manually delete: ' .. path .. '\n\n',
+      vim.log.levels.INFO
+    )
+    callback()
+    return
+  end
+
   local stdin = nil
   local stdout = assert(vim.loop.new_pipe())
   local stderr = assert(vim.loop.new_pipe())
@@ -147,6 +160,21 @@ local function download_bin(url, name, callback)
   stderr:read_start(read_progress)
 end
 
+function M.bins_to_fetch()
+  return {
+    {
+      path = 'https://github.com/Enter-tainer/typst-preview/releases/download/v0.9.0/'
+        .. M.get_typst_bin_name(),
+      name = M.get_typst_bin_name(),
+    },
+    {
+      path = 'https://github.com/vi/websocat/releases/download/v1.12.0/'
+        .. M.get_websocat_bin_name(),
+      name = M.get_websocat_bin_name(),
+    },
+  }
+end
+
 ---Download all binaries and other needed artifact to utils.get_data_path()
 ---@param callback function|nil
 function M.fetch(callback)
@@ -163,20 +191,18 @@ function M.fetch(callback)
     callback()
   end
 
-  -- from https://docs.github.com/en/repositories/releasing-projects-on-github/linking-to-releases
-  download_bin(
-    'https://github.com/Enter-tainer/typst-preview/releases/download/v0.9.0/'
-      .. M.get_typst_bin_name(),
-    M.get_typst_bin_name(),
-    function()
-      download_bin(
-        'https://github.com/vi/websocat/releases/download/v1.12.0/'
-          .. M.get_websocat_bin_name(),
-        M.get_websocat_bin_name(),
-        finish
-      )
+  local function download_bins(bins, callback_)
+    if #bins == 0 then
+      callback_()
+      return
     end
-  )
+    local bin = table.remove(bins, 1)
+    download_bin(bin.path, bin.name, function()
+      download_bins(bins, finish)
+    end)
+  end
+
+  download_bins(M.bins_to_fetch(), finish)
 end
 
 return M
