@@ -2,30 +2,98 @@
 
 The Neovim plugin for [Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview).
 
-**Warning: this plugin is still under development and force push might happen (will never overwrite
-history more than 30 mins old)**
+<!-- *insert screen recording here* -->
 
 ## 📦 Installation
+
 **Lazy.nvim:**
+
 ```lua
 {
-    'chomosuke/typst-preview.nvim',
-    lazy = false, -- or ft = 'toggleterm' if you use toggleterm.nvim
-    -- version = '1.*',
+  'chomosuke/typst-preview.nvim',
+  lazy = false, -- or ft = 'typst'
+  version = '1.*',
+  build = require 'typst-preview'.update,
 }
 ```
+
 **Packer.nvim:**
+
 ```lua
-use { 'chomosuke/typst-preview.nvim', --[[ tag = 'v1.*' ]] }
+use {
+  'chomosuke/typst-preview.nvim',
+  tag = 'v1.*',
+  run = require 'typst-preview'.update,
+}
 ```
+
 **vim-plug:**
+
 ```vim
-Plug 'chomosuke/typst-preview.nvim' ", {'tag': 'v1.*'}
+Plug 'chomosuke/typst-preview.nvim', {'tag': 'v1.*', do: ':TypstPreviewUpdate'}
 ```
 
 ## 🚀 Usage
-You must run `:TypstPreviewUpdate` right after you install (Will not be the case before 1.0)
-### Commands:
-- `:TypstPreview`: Start the preview.
-- `:TypstPreviewStop`: Stop the preview.
-- `:TypstPreviewToggle`: Toggle the preview.
+
+### Commands / Functions:
+
+- `:TypstPreviewUpdate` or `require 'typst-preview'.update()`:
+  - Download the necessary binaries to
+    `vim.fn.fnamemodify(vim.fn.stdpath 'data' .. '/typst-preview/', ':p')`.
+  - This must be run before any other commands can be run.
+    - If you followed the installation instructions, your package manager should automatically run
+      this for you.
+- `:TypstPreview`:
+  - Start the preview.
+- `:TypstPreviewStop`:
+  - Stop the preview.
+- `:TypstPreviewToggle`:
+  - Toggle the preview.
+- `:TypstPreviewFollowCursor` or `require 'typst-preview'.set_follow_cursor(true)`:
+  - Scroll preview as cursor moves.
+  - This is on by default.
+- `:TypstPreviewNoFollowCursor` or `require 'typst-preview'.set_follow_cursor(false)`:
+  - Don't scroll preview as cursor moves.
+- `:TypstPreviewFollowCursorToggle` or
+  `require 'typst-preview'.set_follow_cursor(not init.get_follow_cursor())`.
+- `:TypstPreviewSyncCursor` or `require 'typst-preview.sync_with_cursor()`:
+  - Scroll preview to the current cursor position. This can be used in combination with
+    `:TypstPreviewNoFollowCursor` so that the preview only scroll to the current cursor position
+    when you want it to.
+
+## ⚙️ Configuration
+
+This plugin should work out of the box with no configuration. Call to `setup()` is not required.
+
+### Default
+
+```lua
+require 'typst-preview'.setup {
+  -- Setting this true will enable printing debug information with print()
+  debug = false,
+
+  -- This function will be called to determine the root of the typst project
+  get_root = function(bufnr_of_typst_buffer)
+    return vim.fn.getcwd()
+  end,
+}
+```
+
+## 💪 Features
+
+- Low latency preview: preview your document instantly on type. The incremental rendering technique
+  makes the preview latency as low as possible.
+- Cross jump between code and preview. You can click on the preview to jump to the
+  corresponding code location and have the preview follow your cursor in Neovim.
+
+### Comparison with other tools
+
+The author of [Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview) wrote a
+good comparison [here](https://enter-tainer.github.io/typst-preview/intro.html#loc-1x0.00x949.99).
+
+- [niuiic/typst-preview.nvim](https://github.com/niuiic/typst-preview.nvim): Since this uses
+  [typst-lsp](https://github.com/nvarner/typst-lsp) in the background it has similar advantages and
+  disadvantages of typst-lsp mentioned
+  [here](https://enter-tainer.github.io/typst-preview/intro.html#loc-1x0.00x1600.00):
+  - Higher latency due to the PDF reader having a delay.
+  - Does not support cross jump between code and preview.
