@@ -45,14 +45,13 @@ function M.create_commands()
   local function preview_on()
     -- check if binaries are available and tell them to fetch first
     for _, bin in pairs(fetch.bins_to_fetch()) do
-      local path = fetch.get_path(bin.name)
-      if not utils.file_exist(path) then
+      if fetch.up_to_date(bin.name) then
         utils.notify(
-          path .. ' not found\nPlease run :TypstPreviewUpdate first!',
+          bin.name .. ' not found\nPlease run :TypstPreviewUpdate first!',
           vim.log.levels.ERROR
         )
+        return
       end
-      return
     end
 
     if not previewing[bufnr] then

@@ -109,18 +109,21 @@ function M.get_websocat_bin_name()
   return M.websocat_bin_name
 end
 
-function M.get_path(name)
+local function get_path(name)
   return utils.get_data_path() .. name
 end
 
+function M.up_to_date(name)
+utils.file_exist(get_path(name))
+end
+
 local function download_bin(url, name, callback)
-  local path = M.get_path(name)
-  if utils.file_exist(path) then
+  local path = get_path(name)
+  if M.uptodate(name) then
     print(
       name
-        .. ' already exits, to redownload, please manually delete: '
-        .. path
-        .. '\n\n'
+        .. ' already up to date.'
+        .. '\n'
     )
     callback()
     return
