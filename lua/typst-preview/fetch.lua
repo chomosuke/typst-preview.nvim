@@ -198,11 +198,9 @@ function M.fetch(callback)
     callback = function() end
   end
   local function finish()
-    utils.notify(
-      'All binary downloaded to '
+    print(
+      'All binaries required by typst-preview downloaded to '
         .. utils.get_data_path()
-        .. '\nYou may want to manually delete it if uninstalling typst-preview.nvim',
-      vim.log.levels.INFO
     )
     local record = io.open(record_path, 'w')
     if record == nil then
