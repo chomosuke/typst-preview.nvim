@@ -104,7 +104,7 @@ CONTENTS                                         *typst-preview*
   scroll to the current cursor position when you want it to.
 
 ==============================================================================
- 2. Configuration                                 *typst-preview-lua*
+ 2. Configuration                                 *typst-preview-configuration*
 
 *typst-preview.debug*
 Set this to true to enable debug print. Use `:mes` to view printed messages.
