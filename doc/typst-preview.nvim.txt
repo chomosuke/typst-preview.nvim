@@ -1,0 +1,125 @@
+*typst-preview.nvim.txt* Preview your typst documents.
+
+Author: Richard Li <a13323600@gmail.com>
+
+==============================================================================
+CONTENTS                                         *typst-preview*
+
+  1. Usage
+  2. Configuration
+
+==============================================================================
+ 1. Usage
+
+==============================================================================
+ 1.1 Commands                                     *typst-preview-commands*
+
+*:TypstPreviewUpdate*
+
+  Download the necessary binaries to
+  `vim.fn.fnamemodify(vim.fn.stdpath 'data' .. '/typst-preview/', ':p')`.
+
+  This must be run before any other commands can be run.
+
+  If you followed the installation instructions, your package manager should
+  automatically run this for you.
+
+  Calls: `require 'typst-preview'.update()`
+
+*:TypstPreview*
+
+  Start the preview.
+
+*:TypstPreviewStop*
+
+  Stop the preview.
+
+*:TypstPreviewToggle*
+
+  Toggle the preview.
+
+*:TypstPreviewFollowCursor*
+
+  Scroll preview as cursor moves. This is the default.
+
+  Calls: `require 'typst-preview'.set_follow_cursor(true)`
+
+*:TypstPreviewNoFollowCursor*
+
+  Don't scroll preview as cursor moves.
+
+  Calls: `require 'typst-preview'.set_follow_cursor(false)`:
+
+*:TypstPreviewFollowCursorToggle*
+
+  Start or stop scrolling preview as cursor moves.
+
+  Calls: `require 'typst-preview'.set_follow_cursor(not init.get_follow_cursor())`.
+
+*:TypstPreviewSyncCursor*
+
+  Scroll preview to the current cursor position. This can be used in
+  combination with |:TypstPreviewNoFollowCursor| so that the preview only
+  scroll to the current cursor position when you want it to.
+
+  Calls: `require 'typst-preview.sync_with_cursor()`
+
+==============================================================================
+ 1.2 Lua Functions                                *typst-preview-lua*
+
+*typst-preview.update()*
+
+  Download the necessary binaries to
+  `vim.fn.fnamemodify(vim.fn.stdpath 'data' .. '/typst-preview/', ':p')`.
+
+  This must be run before any other commands can be run.
+
+  If you followed the installation instructions, your package manager should
+  automatically run this for you.
+
+*typst-preview.set_follow_cursor({bool})*
+
+  Calling `require 'typst-preview'.set_follow_cursor(true)` will make preview
+  scroll when cursor moves.
+
+  Calling `require 'typst-preview'.set_follow_cursor(false)` will stop preview
+  from scrolling when cursor moves
+
+  Default: `true`
+
+  Parameters: ~
+    - {follow_cursor} (boolean) whether to scroll preview when cursor moves.
+
+*typst-preview.get_follow_cursor()*
+
+  Returns whether the preview is currently following cursor or not.
+
+  Return: ~
+    (boolean) whether preview is currently following cursor.
+
+*typst-preview.sync_with_cursor()*
+
+  Scroll preview to the current cursor position. This can be used in
+  combination with |:TypstPreviewNoFollowCursor| so that the preview only
+  scroll to the current cursor position when you want it to.
+
+==============================================================================
+ 2. Configuration                                 *typst-preview-lua*
+
+*typst-preview.debug*
+Set this to true to enable debug print. Use `:mes` to view printed messages.
+  Type: `boolean`, Default: `false`
+
+*typst-preview.get_root*
+This function will be called to determine the root of the typst project
+
+  Parameters: ~
+  - {bufnr} (integer) The bufnr of the typst file that being previewed.
+
+  Return: ~
+    (string) The path to the root of the typst project.
+
+  Type: `function`,
+  Default: `function(bufnr_of_typst_buffer) return vim.fn.getcwd() end`
+
+vim:tw=78:ts=2:sw=2:et:ft=help:norl:

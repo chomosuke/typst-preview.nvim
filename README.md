@@ -91,7 +91,7 @@ require 'typst-preview'.setup {
 The author of [Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview) wrote a
 good comparison [here](https://enter-tainer.github.io/typst-preview/intro.html#loc-1x0.00x949.99).
 
-- [niuiic/typst-preview.nvim](https://github.com/niuiic/typst-preview.nvim): Since this uses
+- [niuiic/typst-preview.nvim](https://github.com/niuiic/typst-preview.nvim): Since niuiic/typst-preview.nvim uses
   [typst-lsp](https://github.com/nvarner/typst-lsp), it has similar advantages and
   disadvantages of typst-lsp mentioned
   [here](https://enter-tainer.github.io/typst-preview/intro.html#loc-1x0.00x1600.00):
