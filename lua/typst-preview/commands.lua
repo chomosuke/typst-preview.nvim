@@ -45,7 +45,7 @@ function M.create_commands()
     local bufnr = vim.fn.bufnr()
     -- check if binaries are available and tell them to fetch first
     for _, bin in pairs(fetch.bins_to_fetch()) do
-      if fetch.up_to_date(bin.name) then
+      if not fetch.up_to_date(bin) then
         utils.notify(
           bin.name .. ' not found\nPlease run :TypstPreviewUpdate first!',
           vim.log.levels.ERROR

@@ -113,21 +113,32 @@ local function get_path(name)
   return utils.get_data_path() .. name
 end
 
-function M.up_to_date(name)
-utils.file_exist(get_path(name))
+local record_path = utils.get_data_path() .. 'version_record.txt'
+
+---@param bin {name: string, url: string}
+function M.up_to_date(bin)
+  local record = io.open(record_path, 'r')
+  if record ~= nil then
+    for line in record:lines() do
+      if bin.url == line then
+        return utils.file_exist(get_path(bin.name))
+      end
+    end
+    record:close()
+  end
+  return false
 end
 
-local function download_bin(url, name, callback)
-  local path = get_path(name)
-  if M.uptodate(name) then
-    print(
-      name
-        .. ' already up to date.'
-        .. '\n'
-    )
+local function download_bin(bin, callback)
+  local path = get_path(bin.name)
+  if M.up_to_date(bin) then
+    print(bin.name .. ' already up to date.' .. '\n')
     callback()
     return
   end
+
+  local name = bin.name
+  local url = bin.url
 
   local stdin = nil
   local stdout = assert(vim.loop.new_pipe())
@@ -168,7 +179,7 @@ end
 function M.bins_to_fetch()
   return {
     {
-      url = 'https://github.com/Enter-tainer/typst-preview/releases/download/v0.9.0/'
+      url = 'https://github.com/Enter-tainer/typst-preview/releases/download/v0.9.2/'
         .. M.get_typst_bin_name(),
       name = M.get_typst_bin_name(),
     },
@@ -187,11 +198,20 @@ function M.fetch(callback)
     callback = function() end
   end
   local function finish()
-    print(
+    utils.notify(
       'All binary downloaded to '
         .. utils.get_data_path()
-        .. '\nYou may want to manually delete it if uninstalling typst-preview.nvim'
+        .. '\nYou may want to manually delete it if uninstalling typst-preview.nvim',
+      vim.log.levels.INFO
     )
+    local record = io.open(record_path, 'w')
+    if record == nil then
+      error "Can't open record file!"
+    end
+    for _, bin in pairs(M.bins_to_fetch()) do
+      record:write(bin.url .. '\n')
+    end
+    record:close()
     callback()
   end
 
@@ -201,7 +221,7 @@ function M.fetch(callback)
       return
     end
     local bin = table.remove(bins, 1)
-    download_bin(bin.url, bin.name, function()
+    download_bin(bin, function()
       download_bins(bins, finish)
     end)
   end
