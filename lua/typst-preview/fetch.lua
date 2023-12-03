@@ -102,7 +102,7 @@ function M.get_websocat_bin_name()
         x64 = 'websocat.x86_64-unknown-linux-musl',
       },
       windows = {
-        arm64 = 'websocat.x86_64-pc-windows-gnu.exe',
+        x64 = 'websocat.x86_64-pc-windows-gnu.exe',
       },
     }
   end
