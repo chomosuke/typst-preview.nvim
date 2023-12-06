@@ -20,7 +20,7 @@ else
 end
 
 local function visit(link)
-  vim.fn.jobstart(string.format('%s %s', open_cmd, link), {
+  vim.fn.jobstart(string.format('%s http://%s', open_cmd, link), {
     on_stderr = function(_, data)
       local msg = table.concat(data or {}, '\n')
       if msg ~= '' then
