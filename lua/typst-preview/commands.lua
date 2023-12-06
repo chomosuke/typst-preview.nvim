@@ -14,7 +14,7 @@ elseif
   fetch.is_windows()
   or (fetch.is_linux() and vim.loop.os_uname().release:lower():find 'microsoft')
 then
-  open_cmd = 'cmd.exe /c start ""'
+  open_cmd = 'explorer.exe'
 else
   open_cmd = 'xdg-open'
 end
