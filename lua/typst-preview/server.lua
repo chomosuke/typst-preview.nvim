@@ -30,6 +30,7 @@ function M.spawn(bufnr, callback, set_link)
   local server_handle, _ =
     assert(vim.loop.spawn(utils.get_data_path() .. fetch.get_typst_bin_name(), {
       args = {
+        '--no-open',
         '--data-plane-host',
         '127.0.0.1:0',
         '--control-plane-host',
@@ -104,6 +105,7 @@ function M.spawn(bufnr, callback, set_link)
       if static_host then
         utils.debug 'Setting link'
         vim.defer_fn(function()
+          utils.visit(static_host)
           set_link(static_host)
         end, 0)
       end

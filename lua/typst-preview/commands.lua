@@ -2,33 +2,11 @@ local events = require 'typst-preview.events'
 local fetch = require 'typst-preview.fetch'
 local utils = require 'typst-preview.utils'
 local init = require 'typst-preview.init'
+local server = require 'typst-preview.server'
 
 local M = {}
 
 local previewing = {}
-
-local open_cmd
-if fetch.is_macos() then
-  open_cmd = 'open'
-elseif
-  fetch.is_windows()
-  or (fetch.is_linux() and vim.loop.os_uname().release:lower():find 'microsoft')
-then
-  open_cmd = 'explorer.exe'
-else
-  open_cmd = 'xdg-open'
-end
-
-local function visit(link)
-  vim.fn.jobstart(string.format('%s http://%s', open_cmd, link), {
-    on_stderr = function(_, data)
-      local msg = table.concat(data or {}, '\n')
-      if msg ~= '' then
-        print('typst-preview opening link failed: ' .. msg)
-      end
-    end,
-  })
-end
 
 function M.create_commands()
   local function preview_off(bufnr)
@@ -73,7 +51,7 @@ function M.create_commands()
       end)
     elseif type(previewing[bufnr]) == 'string' then
       print 'Opening another fontend'
-      visit(previewing[bufnr])
+      utils.visit(previewing[bufnr])
     end
   end
 
