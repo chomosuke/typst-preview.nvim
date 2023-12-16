@@ -54,7 +54,7 @@ end
 ---@param link string
 function M.visit(link)
   local cmd = string.format('%s http://%s', open_cmd, link)
-  M.debug(cmd)
+  M.debug('Opening preview with command: ' .. cmd)
   vim.fn.jobstart(cmd, {
     on_stderr = function(_, data)
       local msg = table.concat(data or {}, '\n')

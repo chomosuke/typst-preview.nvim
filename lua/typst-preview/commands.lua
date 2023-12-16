@@ -2,7 +2,6 @@ local events = require 'typst-preview.events'
 local fetch = require 'typst-preview.fetch'
 local utils = require 'typst-preview.utils'
 local init = require 'typst-preview.init'
-local server = require 'typst-preview.server'
 
 local M = {}
 
