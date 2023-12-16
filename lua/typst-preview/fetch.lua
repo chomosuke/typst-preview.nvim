@@ -9,47 +9,19 @@ local M = {
   websocat_bin_name = nil,
 }
 
-function M.is_windows()
-  return vim.loop.os_uname().sysname == 'Windows_NT'
-end
-
-function M.is_macos()
-  return vim.loop.os_uname().sysname == 'Darwin'
-end
-
-function M.is_linux()
-  return vim.loop.os_uname().sysname == 'Linux'
-end
-
--- Stolen from mason.nvim
-
-function M.is_x64()
-  local machine = vim.loop.os_uname().machine
-  return machine == 'x86_64' or machine == 'x64'
-end
-
-function M.is_arm64()
-  local machine = vim.loop.os_uname().machine
-  return machine == 'aarch64'
-    or machine == 'aarch64_be'
-    or machine == 'armv8b'
-    or machine == 'armv8l'
-    or machine == 'arm64'
-end
-
 local function get_bin_name(map)
   local machine
-  if M.is_x64() then
+  if utils.is_x64() then
     machine = 'x64'
-  elseif M.is_arm64() then
+  elseif utils.is_arm64() then
     machine = 'arm64'
   end
   local os
-  if M.is_macos() then
+  if utils.is_macos() then
     os = 'macos'
-  elseif M.is_linux() then
+  elseif utils.is_linux() then
     os = 'linux'
-  elseif M.is_windows() then
+  elseif utils.is_windows() then
     os = 'windows'
   end
 
@@ -153,7 +125,7 @@ local function download_bin(bin, callback)
         'Downloading ' .. name .. ' binary failed, exit code: ' .. code
       )
     else
-      if not M.is_windows() then
+      if not utils.is_windows() then
         -- Set executable permission
         vim.loop.spawn('chmod', { args = { '+x', path } }, callback)
       else
