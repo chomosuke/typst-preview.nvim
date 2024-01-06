@@ -1,5 +1,7 @@
 local M = {
   opts = {
+    --- @type string?
+    open_cmd = nil,
     debug = false,
     get_root = function(_)
       return vim.fn.getcwd()

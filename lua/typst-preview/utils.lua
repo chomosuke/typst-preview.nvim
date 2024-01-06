@@ -40,7 +40,9 @@ function M.is_arm64()
 end
 
 local open_cmd
-if M.is_macos() then
+if config.opts.open_cmd and not config.opts.open_cmd == '' then
+  open_cmd = config.opts.open_cmd
+elseif M.is_macos() then
   open_cmd = 'open'
 elseif M.is_windows() then
   open_cmd = 'explorer.exe'
