@@ -24,7 +24,8 @@ function M.create_commands()
     for _, bin in pairs(fetch.bins_to_fetch()) do
       if not fetch.up_to_date(bin) then
         utils.notify(
-          bin.name .. ' not found\nPlease run :TypstPreviewUpdate first!',
+          bin.name
+            .. ' not found or out of date\nPlease run :TypstPreviewUpdate first!',
           vim.log.levels.ERROR
         )
         return
