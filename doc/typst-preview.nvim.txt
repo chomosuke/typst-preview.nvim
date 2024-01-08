@@ -110,6 +110,10 @@ CONTENTS                                         *typst-preview*
 Set this to true to enable debug print. Use `:mes` to view printed messages.
   Type: `boolean`, Default: `false`
 
+*typst-preview.open_cmd*
+Provide a custom format string to open the output link in `%s`.
+  Type: `string`, Default: `''`
+
 *typst-preview.get_root*
 This function will be called to determine the root of the typst project
 
