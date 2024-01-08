@@ -40,9 +40,7 @@ function M.is_arm64()
 end
 
 local open_cmd
-if config.opts.open_cmd and not config.opts.open_cmd == '' then
-  open_cmd = config.opts.open_cmd
-elseif M.is_macos() then
+if M.is_macos() then
   open_cmd = 'open'
 elseif M.is_windows() then
   open_cmd = 'explorer.exe'
@@ -55,7 +53,12 @@ end
 ---Open link in browser (platform agnostic)
 ---@param link string
 function M.visit(link)
-  local cmd = string.format('%s http://%s', open_cmd, link)
+  local cmd
+  if config.opts.open_cmd ~= '' then
+    cmd = string.format(config.opts.open_cmd, link)
+  else
+    cmd = string.format('%s http://%s', open_cmd, link)
+  end
   M.debug('Opening preview with command: ' .. cmd)
   vim.fn.jobstart(cmd, {
     on_stderr = function(_, data)
