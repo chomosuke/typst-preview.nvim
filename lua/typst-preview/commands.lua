@@ -50,7 +50,7 @@ function M.create_commands()
         previewing[bufnr] = link
       end)
     elseif type(previewing[bufnr]) == 'string' then
-      print 'Opening another fontend'
+      print 'Opening another frontend'
       utils.visit(previewing[bufnr])
     end
   end
