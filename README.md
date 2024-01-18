@@ -79,7 +79,8 @@ require 'typst-preview'.setup {
   -- Setting this true will enable printing debug information with print()
   debug = false,
   -- Custom format string to open the output link provided with %s
-  open_cmd = 'firefox -P typst-preview --class typst-preview http://%s'
+  -- Example: open_cmd = 'firefox -P typst-preview --class typst-preview %s'
+  open_cmd = nil,
   -- This function will be called to determine the root of the typst project
   get_root = function(bufnr_of_typst_buffer)
     return vim.fn.getcwd()

@@ -54,8 +54,8 @@ end
 ---@param link string
 function M.visit(link)
   local cmd
-  if config.opts.open_cmd ~= '' then
-    cmd = string.format(config.opts.open_cmd, link)
+  if config.opts.open_cmd ~= nil then
+    cmd = string.format(config.opts.open_cmd, 'http://' .. link)
   else
     cmd = string.format('%s http://%s', open_cmd, link)
   end
