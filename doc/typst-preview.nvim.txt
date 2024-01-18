@@ -112,7 +112,7 @@ Set this to true to enable debug print. Use `:mes` to view printed messages.
 
 *typst-preview.open_cmd*
 Provide a custom format string to open the output link in `%s`.
-Example value for open_cmd: `'firefox -P typst-preview --class typst-preview %s'`
+Example value for open_cmd: `'firefox -P typst-preview --class typst-preview %s'`.
   Type: `string`, Default: `nil`
 
 *typst-preview.get_root*
