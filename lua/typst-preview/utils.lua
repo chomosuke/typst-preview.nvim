@@ -53,7 +53,12 @@ end
 ---Open link in browser (platform agnostic)
 ---@param link string
 function M.visit(link)
-  local cmd = string.format('%s http://%s', open_cmd, link)
+  local cmd
+  if config.opts.open_cmd ~= nil then
+    cmd = string.format(config.opts.open_cmd, 'http://' .. link)
+  else
+    cmd = string.format('%s http://%s', open_cmd, link)
+  end
   M.debug('Opening preview with command: ' .. cmd)
   vim.fn.jobstart(cmd, {
     on_stderr = function(_, data)
