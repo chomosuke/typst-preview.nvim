@@ -78,9 +78,11 @@ This plugin should work out of the box with no configuration. Call to `setup()` 
 require 'typst-preview'.setup {
   -- Setting this true will enable printing debug information with print()
   debug = false,
+
   -- Custom format string to open the output link provided with %s
   -- Example: open_cmd = 'firefox %s -P typst-preview --class typst-preview'
   open_cmd = nil,
+
   -- This function will be called to determine the root of the typst project
   get_root = function(bufnr_of_typst_buffer)
     return vim.fn.getcwd()
