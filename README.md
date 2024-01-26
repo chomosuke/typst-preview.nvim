@@ -105,3 +105,10 @@ good comparison [here](https://enter-tainer.github.io/typst-preview/intro.html#l
 ## 💻 Contribution
 
 All PRs are welcome.
+
+## Credit
+
+This plugin wouldn't be possible without the work of
+[Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview). If you like this plugin
+enough to star it, please consider staring
+[Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview) as well.
