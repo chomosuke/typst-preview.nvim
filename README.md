@@ -63,7 +63,7 @@ Plug 'chomosuke/typst-preview.nvim', {'tag': 'v0.1.*', do: ':TypstPreviewUpdate'
   - Don't scroll preview as cursor moves.
 - `:TypstPreviewFollowCursorToggle` or
   `require 'typst-preview'.set_follow_cursor(not init.get_follow_cursor())`.
-- `:TypstPreviewSyncCursor` or `require 'typst-preview.sync_with_cursor()`:
+- `:TypstPreviewSyncCursor` or `require 'typst-preview'.sync_with_cursor()`:
   - Scroll preview to the current cursor position. This can be used in combination with
     `:TypstPreviewNoFollowCursor` so that the preview only scroll to the current cursor position
     when you want it to.
@@ -83,9 +83,10 @@ require 'typst-preview'.setup {
   -- Example: open_cmd = 'firefox %s -P typst-preview --class typst-preview'
   open_cmd = nil,
 
-  -- Setting this to always will invert black and white in the preview
-  -- Setting this to auto will invert depending if the browser has enable dark mode
-  invert_colors = "never",
+  -- Setting this to 'always' will invert black and white in the preview
+  -- Setting this to 'auto' will invert depending if the browser has enable
+  -- dark mode
+  invert_colors = 'never',
 
   -- This function will be called to determine the root of the typst project
   get_root = function(bufnr_of_typst_buffer)
