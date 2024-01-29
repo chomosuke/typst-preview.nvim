@@ -1,6 +1,7 @@
 local M = {
   opts = {
     open_cmd = nil,
+    invert_colors = 'never',
     debug = false,
     get_root = function(_)
       return vim.fn.getcwd()
