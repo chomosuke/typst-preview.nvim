@@ -30,6 +30,8 @@ function M.spawn(bufnr, callback, set_link)
   local server_handle, _ =
     assert(vim.loop.spawn(utils.get_data_path() .. fetch.get_typst_bin_name(), {
       args = {
+        '--invert-colors',
+        config.opts.invert_colors,
         '--no-open',
         '--data-plane-host',
         '127.0.0.1:0',
