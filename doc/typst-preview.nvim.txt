@@ -115,6 +115,13 @@ Provide a custom format string to open the output link in `%s`.
 Example value for open_cmd: `'firefox %s -P typst-preview --class typst-preview'`.
   Type: `string`, Default: `nil`
 
+*typst-preview.invert_colors*
+Can be used to invert colors in preview.
+Set to `never` to disable.
+Set to `always` to enable.
+Set to `auto` to enable if environment (usually browser) has enabled darkmode.
+  Type: `string`, Default: `never`
+
 *typst-preview.get_root*
 This function will be called to determine the root of the typst project
 
