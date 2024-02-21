@@ -53,7 +53,11 @@ function M.spawn(bufnr, callback, set_link)
     local addr = 'ws://' .. host .. '/'
     local websocat_handle, _ = assert(
       vim.loop.spawn(utils.get_data_path() .. fetch.get_websocat_bin_name(), {
-        args = { addr },
+        args = {
+          '-B',
+          '10000000',
+          addr,
+        },
         stdio = { stdin, stdout, stderr },
       })
     )
