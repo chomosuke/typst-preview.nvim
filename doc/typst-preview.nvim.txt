@@ -115,6 +115,13 @@ Provide a custom format string to open the output link in `%s`.
 Example value for open_cmd: `'firefox %s -P typst-preview --class typst-preview'`.
   Type: `string`, Default: `nil`
 
+*typst-preview.executable*
+Provide name or path to `typst-preview` executable.
+Setting this will skip the download of the executable by the plugin.
+Warning: Be aware that your version might be older than the one
+required.
+  Type: `string`, Default: `nil`
+
 *typst-preview.invert_colors*
 Can be used to invert colors in preview.
 Set to `'never'` to disable.
