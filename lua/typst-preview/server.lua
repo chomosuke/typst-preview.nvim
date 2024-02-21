@@ -27,8 +27,9 @@ function M.spawn(bufnr, callback, set_link)
   local file_path = M.get_buffer_path(bufnr)
   local server_stdout = assert(vim.loop.new_pipe())
   local server_stderr = assert(vim.loop.new_pipe())
+  local typst_preview_bin = config.opts.executable and config.opts.executable or ( utils.get_data_path() .. fetch.get_typst_bin_name() )
   local server_handle, _ =
-    assert(vim.loop.spawn(utils.get_data_path() .. fetch.get_typst_bin_name(), {
+    assert(vim.loop.spawn(typst_preview_bin, {
       args = {
         '--invert-colors',
         config.opts.invert_colors,

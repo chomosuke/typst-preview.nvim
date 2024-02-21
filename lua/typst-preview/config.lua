@@ -3,6 +3,7 @@ local M = {
     open_cmd = nil,
     invert_colors = 'never',
     debug = false,
+    executable = nil,
     get_root = function(_)
       return vim.fn.getcwd()
     end,
