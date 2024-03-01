@@ -9,10 +9,6 @@ local M = {
   get_follow_cursor = autocmds.get_follow_cursor,
   sync_with_cursor = autocmds.sync_with_cursor,
   update =  function()
-    if config.opts.executable then
-        utils.debug(string.format("Executable '%s' has been provided, please update manually.",config.opts.executable))
-        return
-    end
     fetch.fetch()
   end,
 }

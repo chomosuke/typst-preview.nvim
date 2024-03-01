@@ -3,7 +3,10 @@ local M = {
     open_cmd = nil,
     invert_colors = 'never',
     debug = false,
-    executable = nil,
+    dependencies_bin = {
+            ['typst-preview'] = nil,
+            ['websocat'] = nil
+    },
     get_root = function(_)
       return vim.fn.getcwd()
     end,
