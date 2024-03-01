@@ -83,11 +83,14 @@ require 'typst-preview'.setup {
   -- Example: open_cmd = 'firefox %s -P typst-preview --class typst-preview'
   open_cmd = nil,
 
-  -- Provide name or path to `typst-preview` executable
+  -- Provide name or path to binaries for dependencies.
   -- Setting this will skip the download of the executable by the plugin.
   -- Warning: Be aware that your version might be older than the one
   -- required.
-  executable = nil,
+  dependencies_bin = {
+          ['typst-preview'] = nil,
+          ['websocat'] = nil
+  },
 
   -- Setting this to 'always' will invert black and white in the preview
   -- Setting this to 'auto' will invert depending if the browser has enable
