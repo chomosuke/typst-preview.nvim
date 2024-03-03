@@ -45,7 +45,10 @@ function M.watch(bufnr, set_link)
 
         utils.debug(event['end'][1] .. ' ' .. event['end'][2])
         M.suppress_on_scroll = true
-        vim.api.nvim_win_set_cursor(0, {event['end'][1] + 1, event['end'][2] - 1})
+        vim.api.nvim_win_set_cursor(
+          0,
+          { event['end'][1] + 1, event['end'][2] - 1 }
+        )
         vim.defer_fn(function()
           M.suppress_on_scroll = false
         end, 100)

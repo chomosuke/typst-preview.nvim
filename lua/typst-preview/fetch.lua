@@ -1,4 +1,5 @@
 local utils = require 'typst-preview.utils'
+local config = require 'typst-preview.config'
 
 -- Responsible for downloading all required binary.
 -- Currently includes typst-preview and websocat
@@ -87,13 +88,13 @@ end
 
 local record_path = utils.get_data_path() .. 'version_record.txt'
 
----@param bin {name: string, url: string}
+---@param bin {name: string, bin_name:string, url: string}
 function M.up_to_date(bin)
   local record = io.open(record_path, 'r')
   if record ~= nil then
     for line in record:lines() do
       if bin.url == line then
-        return utils.file_exist(get_path(bin.name))
+        return utils.file_exist(get_path(bin.bin_name))
       end
     end
     record:close()
@@ -102,7 +103,17 @@ function M.up_to_date(bin)
 end
 
 local function download_bin(bin, callback)
-  local path = get_path(bin.name)
+  local path = get_path(bin.bin_name)
+  if config.opts.dependencies_bin[bin.name] then
+    print(
+      "Binary for '"
+        .. bin.name
+        .. "' has been provided in config.\n"
+        .. 'Please ensure manually that it is up to date.\n'
+    )
+    callback()
+    return
+  end
   if M.up_to_date(bin) then
     print(bin.name .. ' already up to date.' .. '\n')
     callback()
@@ -153,12 +164,14 @@ function M.bins_to_fetch()
     {
       url = 'https://github.com/Enter-tainer/typst-preview/releases/download/v0.10.8/'
         .. M.get_typst_bin_name(),
-      name = M.get_typst_bin_name(),
+      bin_name = M.get_typst_bin_name(),
+      name = 'typst-preview',
     },
     {
       url = 'https://github.com/vi/websocat/releases/download/v1.12.0/'
         .. M.get_websocat_bin_name(),
-      name = M.get_websocat_bin_name(),
+      bin_name = M.get_websocat_bin_name(),
+      name = 'websocat',
     },
   }
 end
@@ -174,9 +187,9 @@ function M.fetch(callback)
       'All binaries required by typst-preview downloaded to '
         .. utils.get_data_path()
     )
-    local record = io.open(record_path, 'w')
+    local record, err = io.open(record_path, 'w')
     if record == nil then
-      error "Can't open record file!"
+      error("Can't open record file!: " .. err)
     end
     for _, bin in pairs(M.bins_to_fetch()) do
       record:write(bin.url .. '\n')

@@ -2,6 +2,7 @@ local events = require 'typst-preview.events'
 local fetch = require 'typst-preview.fetch'
 local utils = require 'typst-preview.utils'
 local init = require 'typst-preview.init'
+local config = require 'typst-preview.config'
 
 local M = {}
 
@@ -22,7 +23,9 @@ function M.create_commands()
     local bufnr = vim.fn.bufnr()
     -- check if binaries are available and tell them to fetch first
     for _, bin in pairs(fetch.bins_to_fetch()) do
-      if not fetch.up_to_date(bin) then
+      if
+        not fetch.up_to_date(bin) and not config.opts.dependencies_bin[bin.name]
+      then
         utils.notify(
           bin.name
             .. ' not found or out of date\nPlease run :TypstPreviewUpdate first!',

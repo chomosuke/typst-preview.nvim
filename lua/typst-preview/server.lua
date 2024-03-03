@@ -27,40 +27,41 @@ function M.spawn(bufnr, callback, set_link)
   local file_path = M.get_buffer_path(bufnr)
   local server_stdout = assert(vim.loop.new_pipe())
   local server_stderr = assert(vim.loop.new_pipe())
-  local server_handle, _ =
-    assert(vim.loop.spawn(utils.get_data_path() .. fetch.get_typst_bin_name(), {
-      args = {
-        '--invert-colors',
-        config.opts.invert_colors,
-        '--no-open',
-        '--data-plane-host',
-        '127.0.0.1:0',
-        '--control-plane-host',
-        '127.0.0.1:0',
-        '--static-file-host',
-        '127.0.0.1:0',
-        '--root',
-        config.opts.get_root(bufnr),
-        file_path,
-      },
-      stdio = { nil, server_stdout, server_stderr },
-    }))
+  local typst_preview_bin = config.opts.dependencies_bin['typst-preview']
+    or (utils.get_data_path() .. fetch.get_typst_bin_name())
+  local server_handle, _ = assert(vim.loop.spawn(typst_preview_bin, {
+    args = {
+      '--invert-colors',
+      config.opts.invert_colors,
+      '--no-open',
+      '--data-plane-host',
+      '127.0.0.1:0',
+      '--control-plane-host',
+      '127.0.0.1:0',
+      '--static-file-host',
+      '127.0.0.1:0',
+      '--root',
+      config.opts.get_root(bufnr),
+      file_path,
+    },
+    stdio = { nil, server_stdout, server_stderr },
+  }))
 
   local function connect(host)
     local stdin = assert(vim.loop.new_pipe())
     local stdout = assert(vim.loop.new_pipe())
     local stderr = assert(vim.loop.new_pipe())
     local addr = 'ws://' .. host .. '/'
-    local websocat_handle, _ = assert(
-      vim.loop.spawn(utils.get_data_path() .. fetch.get_websocat_bin_name(), {
-        args = {
-          '-B',
-          '10000000',
-          addr,
-        },
-        stdio = { stdin, stdout, stderr },
-      })
-    )
+    local websocat_bin = config.opts.dependencies_bin['websocat']
+      or (utils.get_data_path() .. fetch.get_websocat_bin_name())
+    local websocat_handle, _ = assert(vim.loop.spawn(websocat_bin, {
+      args = {
+        '-B',
+        '10000000',
+        addr,
+      },
+      stdio = { stdin, stdout, stderr },
+    }))
     utils.debug('websocat connecting to: ' .. addr)
     stderr:read_start(function(err, data)
       if err then
