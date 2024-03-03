@@ -91,7 +91,7 @@ local record_path = utils.get_data_path() .. 'version_record.txt'
 ---@param bin {name: string, bin_name:string, url: string}
 function M.up_to_date(bin)
   if config.opts.dependencies_bin[bin.name] then
-    utils.print(
+    print(
       bin.name
         .. ' is managed by the user (provided via config.dependencies_bin).\n'
         .. 'Please ensure manually that it is the correct version.\n'
@@ -113,7 +113,7 @@ end
 local function download_bin(bin, callback)
   local path = get_path(bin.bin_name)
   if M.up_to_date(bin) then
-    utils.print(bin.name .. ' already up to date.' .. '\n')
+    print(bin.name .. ' already up to date.' .. '\n')
     callback()
     return
   end
