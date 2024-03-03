@@ -91,8 +91,12 @@ local record_path = utils.get_data_path() .. 'version_record.txt'
 ---@param bin {name: string, bin_name:string, url: string}
 function M.up_to_date(bin)
   if config.opts.dependencies_bin[bin.name] then
-      utils.print(bin.name .. ' is managed by the user (provided via config.dependencies_bin)' .. '\n')
-      return true
+    utils.print(
+      bin.name
+        .. ' is managed by the user (provided via config.dependencies_bin)'
+        .. '\n'
+    )
+    return true
   end
   local record = io.open(record_path, 'r')
   if record ~= nil then
@@ -159,13 +163,13 @@ function M.bins_to_fetch()
       url = 'https://github.com/Enter-tainer/typst-preview/releases/download/v0.10.8/'
         .. M.get_typst_bin_name(),
       bin_name = M.get_typst_bin_name(),
-      name = 'typst-preview'
+      name = 'typst-preview',
     },
     {
       url = 'https://github.com/vi/websocat/releases/download/v1.12.0/'
         .. M.get_websocat_bin_name(),
       bin_name = M.get_websocat_bin_name(),
-      name = 'websocat'
+      name = 'websocat',
     },
   }
 end
@@ -181,9 +185,9 @@ function M.fetch(callback)
       'All binaries required by typst-preview downloaded to '
         .. utils.get_data_path()
     )
-    local record,err = io.open(record_path, 'w')
+    local record, err = io.open(record_path, 'w')
     if record == nil then
-      error("Can't open record file!: "..err)
+      error("Can't open record file!: " .. err)
     end
     for _, bin in pairs(M.bins_to_fetch()) do
       record:write(bin.url .. '\n')
@@ -192,15 +196,20 @@ function M.fetch(callback)
     callback()
   end
 
-  local function download_bins(bins,callback_)
-      for _, bin in ipairs(bins) do
-            if config.opts.dependencies_bin[bin.name] then
-                utils.print(string.format("Binary for '%s' has been provided in config.",bin.name))
-            else
-                download_bin(bin,function() end)
-            end
+  local function download_bins(bins, callback_)
+    for _, bin in ipairs(bins) do
+      if config.opts.dependencies_bin[bin.name] then
+        utils.print(
+          string.format(
+            "Binary for '%s' has been provided in config.",
+            bin.name
+          )
+        )
+      else
+        download_bin(bin, function() end)
       end
-      callback_()
+    end
+    callback_()
   end
 
   download_bins(M.bins_to_fetch(), finish)

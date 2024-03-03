@@ -5,7 +5,7 @@
 
 local M = {
   ---@type Comm[]
-  comms = {}
+  comms = {},
 }
 
 ---@return Comm comm
