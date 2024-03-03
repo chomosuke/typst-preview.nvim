@@ -197,19 +197,14 @@ function M.fetch(callback)
   end
 
   local function download_bins(bins, callback_)
-    for _, bin in ipairs(bins) do
-      if config.opts.dependencies_bin[bin.name] then
-        utils.print(
-          string.format(
-            "Binary for '%s' has been provided in config.",
-            bin.name
-          )
-        )
-      else
-        download_bin(bin, function() end)
-      end
+    if #bins == 0 then
+      callback_()
+      return
     end
-    callback_()
+    local bin = table.remove(bins, 1)
+    download_bin(bin, function()
+      download_bins(bins, finish)
+    end)
   end
 
   download_bins(M.bins_to_fetch(), finish)
