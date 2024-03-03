@@ -93,8 +93,8 @@ function M.up_to_date(bin)
   if config.opts.dependencies_bin[bin.name] then
     utils.print(
       bin.name
-        .. ' is managed by the user (provided via config.dependencies_bin)'
-        .. '\n'
+        .. ' is managed by the user (provided via config.dependencies_bin).\n'
+        .. 'Please ensure manually that it is the correct version.\n'
     )
     return true
   end
