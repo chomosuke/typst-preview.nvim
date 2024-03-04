@@ -101,14 +101,12 @@ end
 ---@param name string
 ---@param autocmds { event: string[]|string, opts: AutocmdOpts }[]
 function M.create_autocmds(name, autocmds)
-  vim.defer_fn(function()
-    local id = vim.api.nvim_create_augroup(name, {})
-    for _, autocmd in ipairs(autocmds) do
-      ---@diagnostic disable-next-line: inject-field
-      autocmd.opts.group = id
-      vim.api.nvim_create_autocmd(autocmd.event, autocmd.opts)
-    end
-  end, 0)
+  local id = vim.api.nvim_create_augroup(name, {})
+  for _, autocmd in ipairs(autocmds) do
+    ---@diagnostic disable-next-line: inject-field
+    autocmd.opts.group = id
+    vim.api.nvim_create_autocmd(autocmd.event, autocmd.opts)
+  end
 end
 
 ---print that can be called anywhere
