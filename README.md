@@ -124,5 +124,5 @@ All PRs are welcome.
 
 This plugin wouldn't be possible without the work of
 [Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview). If you like this plugin
-enough to star it, please consider staring
+enough to star it, please consider starring
 [Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview) as well.
