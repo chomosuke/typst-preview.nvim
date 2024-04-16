@@ -12,14 +12,14 @@ local M = {
 ---Do all work necessary to start a preview for a buffer.
 ---@param bufnr integer
 ---@param set_link function
-function M.watch(bufnr, set_link)
+function M.watch(bufnr, mode, set_link)
   utils.debug('Watching buffer: ' .. bufnr)
 
   if bufnr == 0 then
     bufnr = vim.fn.bufnr()
   end
 
-  server.spawn(bufnr, function(close_server, write, read_start)
+  server.spawn(bufnr, mode, function(close_server, write, read_start)
     local comm = communicator.new(close_server, write, read_start)
     communicator.comms[bufnr] = comm
 

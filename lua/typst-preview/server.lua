@@ -20,10 +20,11 @@ end
 
 ---Spawn the server and connect to it using the websocat process
 ---@param bufnr integer
+---@param mode string preview mode, "document" (default) or "slide"
 ---@param callback function Called after server spawn completes, parameter is
 --(close, write, read_start)
 ---@param set_link function
-function M.spawn(bufnr, callback, set_link)
+function M.spawn(bufnr, mode, callback, set_link)
   local file_path = M.get_buffer_path(bufnr)
   local server_stdout = assert(vim.loop.new_pipe())
   local server_stderr = assert(vim.loop.new_pipe())
@@ -40,6 +41,8 @@ function M.spawn(bufnr, callback, set_link)
       '127.0.0.1:0',
       '--static-file-host',
       '127.0.0.1:0',
+      '--preview-mode',
+      mode,
       '--root',
       config.opts.get_root(bufnr),
       file_path,
