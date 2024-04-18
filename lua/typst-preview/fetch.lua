@@ -162,7 +162,7 @@ end
 function M.bins_to_fetch()
   return {
     {
-      url = 'https://github.com/Enter-tainer/typst-preview/releases/download/v0.11.2/'
+      url = 'https://github.com/Enter-tainer/typst-preview/releases/download/v0.11.4/'
         .. M.get_typst_bin_name(),
       bin_name = M.get_typst_bin_name(),
       name = 'typst-preview',
