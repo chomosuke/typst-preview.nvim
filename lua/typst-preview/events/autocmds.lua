@@ -43,7 +43,7 @@ local function register_autocmds(bufnr)
   local last_line
   local autocmds = {
     {
-      event = { 'TextChanged', 'TextChangedI' },
+      event = { 'TextChanged', 'TextChangedI', 'TextChangedP', 'InsertLeave' },
       callback = function(comm, _)
         utils.debug('updating buffer: ' .. bufnr)
         comm.write(vim.fn.json_encode {
