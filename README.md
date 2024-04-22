@@ -17,10 +17,19 @@ https://github.com/chomosuke/typst-preview.nvim/assets/38484873/9f8ecf0f-aa1c-4e
 
 ```lua
 {
-  'chomosuke/typst-preview.nvim',
-  lazy = false, -- or ft = 'typst'
-  version = '0.1.*',
-  build = function() require 'typst-preview'.update() end,
+  "chomosuke/typst-preview.nvim",
+  cmd = {
+    "TypstPreviewUpdate",
+    "TypstPreview",
+    "TypstPreviewStop",
+    "TypstPreviewToggle",
+    "TypstPreviewFollowCursor",
+    "TypstPreviewNoFollowCursor",
+    "TypstPreviewFollowCursorToggle",
+    "TypstPreviewSyncCursor",
+  },
+  version = "0.1.*",
+  build = function() require("typst-preview").update() end,
 }
 ```
 
