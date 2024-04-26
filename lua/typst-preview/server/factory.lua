@@ -22,9 +22,10 @@ end
 ---@param bufnr integer
 ---@param callback function Called after server spawn completes, parameter is
 --(close, write, read_start)
----@param set_link function
-function M.spawn(bufnr, callback, set_link)
-  local file_path = M.get_buffer_path(bufnr)
+function M.spawn(file_path, callback)
+  if file_path == nil then
+    todo()
+  end
   local server_stdout = assert(vim.loop.new_pipe())
   local server_stderr = assert(vim.loop.new_pipe())
   local typst_preview_bin = config.opts.dependencies_bin['typst-preview']
