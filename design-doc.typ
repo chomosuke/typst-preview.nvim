@@ -1,4 +1,4 @@
-## General notes
+== General notes
 - The entire plugin should be typed.
 - There should be an object that each represent a file that's being watched.
 - You should be able to index the objects with absolute file path.
@@ -9,7 +9,7 @@
 - fetch.lua can stay, it just download some binaries.
 - events/ and commands.lua should be rewritten.
 
-## New architecture
+== New architecture
 - `server/`
   - `server/factory.lua` makes servers, which are objects each representing a
     file or a buffer that a server is watching.
