@@ -7,8 +7,11 @@ local M = {
       ['typst-preview'] = nil,
       ['websocat'] = nil,
     },
-    get_root = function(_)
-      return vim.fn.getcwd()
+    get_root = function(path)
+      return vim.fn.fnamemodify(path, ':p:h')
+    end,
+    get_main_file = function(path)
+      return path
     end,
   },
 }
