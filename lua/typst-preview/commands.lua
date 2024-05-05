@@ -3,24 +3,22 @@ local fetch = require 'typst-preview.fetch'
 local utils = require 'typst-preview.utils'
 local init = require 'typst-preview.init'
 local config = require 'typst-preview.config'
+local server = require 'typst-preview.server'
 
 local M = {}
 
-local previewing = {}
-
 function M.create_commands()
-  local function preview_off(bufnr)
-    bufnr = bufnr or vim.fn.bufnr()
-    if previewing[bufnr] then
-      previewing[bufnr] = false
-      events.stop(bufnr)
+  local function preview_off()
+    local path = M.get_buf_path(0)
+
+    if path ~= '' and server.remove(config.opts.get_main_file(path)) then
+      utils.print 'Preview stopped'
     else
       utils.print 'Preview not running'
     end
   end
 
   local function preview_on()
-    local bufnr = vim.fn.bufnr()
     -- check if binaries are available and tell them to fetch first
     for _, bin in pairs(fetch.bins_to_fetch()) do
       if
@@ -35,26 +33,21 @@ function M.create_commands()
       end
     end
 
-    if not previewing[bufnr] then
-      utils.create_autocmds('typst-preview-autocmds-unload-' .. bufnr, {
-        {
-          event = 'BufUnload',
-          opts = {
-            callback = function()
-              -- preview_off is the source of truth of cleaning up everything.
-              preview_off(bufnr)
-            end,
-            buffer = bufnr,
-          },
-        },
-      })
-      previewing[bufnr] = true
-      events.watch(bufnr, function(link)
-        previewing[bufnr] = link
+    local path = M.get_buf_path(0)
+    if path == '' then
+      print 'Can not preview an unsaved buffer.'
+      return
+    end
+
+    path = config.opts.get_main_file(path)
+    local s = server.get(path)
+    if s == nil then
+      server.init(path, function(ser)
+        events.watch(ser)
       end)
-    elseif type(previewing[bufnr]) == 'string' then
+    else
       print 'Opening another frontend'
-      utils.visit(previewing[bufnr])
+      utils.visit(s.link)
     end
   end
 
@@ -65,7 +58,8 @@ function M.create_commands()
     preview_off()
   end, {})
   vim.api.nvim_create_user_command('TypstPreviewToggle', function()
-    if previewing[vim.fn.bufnr()] then
+    local path = M.get_buf_path(0)
+    if path ~= '' and server.get(config.opts.get_main_file(path)) then
       preview_off()
     else
       preview_on()

@@ -1,23 +1,19 @@
 local server = require 'typst-preview.server'
 local utils = require 'typst-preview.utils'
-local super = require 'typst-preview.events'
-local communicator = require 'typst-preview.events.communicator'
+local config = require 'typst-preview.config'
 
 local M = {}
-
--- TODO per buffer panel_scroll config
-local panel_scroll = true
 
 ---Set the way preview scrolling respond to cursor movement
 ---@param enabled boolean
 function M.set_follow_cursor(enabled)
-  panel_scroll = enabled
+  config.opts.follow_cursor = enabled
 end
 
 ---Get current preview scrolling mode
 ---@return boolean
 function M.get_follow_cursor()
-  return panel_scroll
+  return config.opts.follow_cursor
 end
 
 local function sync_with_cursor(comm, bufnr)
@@ -57,7 +53,7 @@ local function register_autocmds(bufnr)
     {
       event = { 'CursorMoved', 'CursorMovedI' },
       callback = function(comm, ev)
-        if super.suppress_on_scroll or not panel_scroll then
+        if super.suppress_on_scroll or not M.get_follow_cursor() then
           return
         end
         utils.debug('scrolling: ' .. bufnr)
@@ -70,6 +66,16 @@ local function register_autocmds(bufnr)
         end
       end,
     },
+        {
+          event = 'BufUnload',
+          opts = {
+            callback = function()
+              -- preview_off is the source of truth of cleaning up everything.
+              preview_off(bufnr)
+            end,
+            buffer = bufnr,
+          },
+        },
   }
 
   for i, autocmd in pairs(autocmds) do

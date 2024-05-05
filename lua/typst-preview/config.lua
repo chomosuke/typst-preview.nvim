@@ -13,6 +13,7 @@ local M = {
     get_main_file = function(path)
       return path
     end,
+    follow_cursor = true,
   },
 }
 

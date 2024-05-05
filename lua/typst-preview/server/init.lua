@@ -10,11 +10,31 @@ local M = {}
 ---@field write fun(data: string)
 ---@field listenerss { [string]: fun(event: table)[] }
 
----Init or retrieve a server base on the path of main file
+---Init a server
 ---@param path string
 ---@param callback fun(server: Server)
-function M.get_or_init(path, callback)
-  inventory.get_or_init(path, callback)
+function M.init(path, callback)
+  return inventory.init(path, callback)
+end
+
+---Get a server
+---@param path string
+---@return Server?
+function M.get(path)
+  return inventory.get(path)
+end
+
+---Get all servers
+---@return Server[]
+function M.get_all()
+  return inventory.get_all()
+end
+
+---Remove a server and clean everything up
+---@param path string
+---@return boolean removed Whether a server with the path existed before.
+function M.remove(path)
+  return inventory.remove(path)
 end
 
 ---Update a memory file.
@@ -59,7 +79,7 @@ function M.sync_with_cursor(self)
   utils.debug('scroll to line: ' .. line .. ', character: ' .. cursor[2])
   self.write(vim.fn.json_encode {
     event = 'panelScrollTo',
-    filepath = vim.api.nvim_buf_get_name(0),
+    filepath = utils.get_buf_path(0),
     line = line,
     character = cursor[2],
   } .. '\n')
