@@ -1,12 +1,19 @@
 local events = require 'typst-preview.events'
 local fetch = require 'typst-preview.fetch'
 local utils = require 'typst-preview.utils'
-local init = require 'typst-preview.init'
 local config = require 'typst-preview.config'
 local server = require 'typst-preview.server'
 
 local M = {}
 
+---Scroll all preview to cursor position.
+function M.sync_with_cursor()
+  for _, ser in pairs(server.get_all()) do
+    server.sync_with_cursor(ser)
+  end
+end
+
+---Create user commands
 function M.create_commands()
   local function preview_off()
     local path = utils.get_buf_path(0)
@@ -51,12 +58,12 @@ function M.create_commands()
     end
   end
 
-  vim.api.nvim_create_user_command('TypstPreviewUpdate', init.update, {})
+  vim.api.nvim_create_user_command('TypstPreviewUpdate', function()
+    fetch.fetch(nil)
+  end, {})
 
   vim.api.nvim_create_user_command('TypstPreview', preview_on, {})
-  vim.api.nvim_create_user_command('TypstPreviewStop', function()
-    preview_off()
-  end, {})
+  vim.api.nvim_create_user_command('TypstPreviewStop', preview_off, {})
   vim.api.nvim_create_user_command('TypstPreviewToggle', function()
     local path = utils.get_buf_path(0)
     if path ~= '' and server.get(config.opts.get_main_file(path)) then
@@ -67,16 +74,16 @@ function M.create_commands()
   end, {})
 
   vim.api.nvim_create_user_command('TypstPreviewFollowCursor', function()
-    init.set_follow_cursor(true)
+    config.set_follow_cursor(true)
   end, {})
   vim.api.nvim_create_user_command('TypstPreviewNoFollowCursor', function()
-    init.set_follow_cursor(false)
+    config.set_follow_cursor(false)
   end, {})
   vim.api.nvim_create_user_command('TypstPreviewFollowCursorToggle', function()
-    init.set_follow_cursor(not init.get_follow_cursor())
+    config.set_follow_cursor(not config.get_follow_cursor())
   end, {})
   vim.api.nvim_create_user_command('TypstPreviewSyncCursor', function()
-    init.sync_with_cursor()
+    M.sync_with_cursor()
   end, {})
 end
 

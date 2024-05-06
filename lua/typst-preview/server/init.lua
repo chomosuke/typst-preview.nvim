@@ -1,6 +1,12 @@
 local utils = require 'typst-preview.utils'
 local inventory = require 'typst-preview.server.inventory'
-local M = {}
+local M = {
+  init = inventory.init,
+  get = inventory.get,
+  get_all = inventory.get_all,
+  remove = inventory.remove,
+  remove_all = inventory.remove_all,
+}
 
 ---@class (exact) Server
 ---@field path string Unsaved buffer will not be previewable.
@@ -9,38 +15,6 @@ local M = {}
 ---@field close fun()
 ---@field write fun(data: string)
 ---@field listenerss { [string]: fun(event: table)[] }
-
----Init a server
----@param path string
----@param callback fun(server: Server)
-function M.init(path, callback)
-  return inventory.init(path, callback)
-end
-
----Get a server
----@param path string
----@return Server?
-function M.get(path)
-  return inventory.get(path)
-end
-
----Get all servers
----@return Server[]
-function M.get_all()
-  return inventory.get_all()
-end
-
----Remove a server and clean everything up
----@param path string
----@return boolean removed Whether a server with the path existed before.
-function M.remove(path)
-  return inventory.remove(path)
-end
-
----Remove all servers
-function M.remove_all()
-  return inventory.remove_all()
-end
 
 ---Update a memory file.
 ---@param self Server
