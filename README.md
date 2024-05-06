@@ -98,9 +98,18 @@ require 'typst-preview'.setup {
   invert_colors = 'never',
 
   -- This function will be called to determine the root of the typst project
-  get_root = function(bufnr_of_typst_buffer)
-    return vim.fn.getcwd()
+  get_root = function(path_of_main_file)
+    return vim.fn.fnamemodify(path_of_main_file, ':p:h')
   end,
+
+  -- This function will be called to determine the main file of the typst
+  -- project.
+  get_main_file = function(path_of_buffer)
+    return path_of_buffer
+  end,
+
+  -- Whether the preview will follow the cursor in the source file
+  follow_cursor = true,
 }
 ```
 
