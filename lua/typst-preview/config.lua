@@ -1,8 +1,9 @@
 local M = {
   opts = {
+    debug = false,
     open_cmd = nil,
     invert_colors = 'never',
-    debug = false,
+    follow_cursor = true,
     dependencies_bin = {
       ['typst-preview'] = nil,
       ['websocat'] = nil,
@@ -13,7 +14,6 @@ local M = {
     get_main_file = function(path)
       return path
     end,
-    follow_cursor = true,
   },
 }
 

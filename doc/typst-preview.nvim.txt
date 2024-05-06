@@ -118,19 +118,23 @@ Provide a custom format string to open the output link in `%s`.
 Example value for open_cmd: `'firefox %s -P typst-preview --class typst-preview'`.
   Type: `string`, Default: `nil`
 
-*typst-preview.dependencies_bin*
-Provide the path to binaries for dependencies.
-Setting this will skip the download of the binary by the plugin.
-Warning: Be aware that your version might be older than the one
-required.
-  Type: `table`, Default: `{['typst-preview'] = nil, ['websocat'] = nil}`
-
 *typst-preview.invert_colors*
 Can be used to invert colors in preview.
 Set to `'never'` to disable.
 Set to `'always'` to enable.
 Set to `'auto'` to enable if environment (usually browser) has enabled darkmode.
   Type: `string`, Default: `'never'`
+
+*typst-preview.follow_cursor*
+Set this to false to stop the preview from scrolling as the cursor moves.
+  Type: `boolean`, Default: `true`
+
+*typst-preview.dependencies_bin*
+Provide the path to binaries for dependencies.
+Setting this will skip the download of the binary by the plugin.
+Warning: Be aware that your version might be older than the one
+required.
+  Type: `table`, Default: `{['typst-preview'] = nil, ['websocat'] = nil}`
 
 *typst-preview.get_main_file*
 This function will be called to determine the main file of the typst project
@@ -142,8 +146,7 @@ This function will be called to determine the main file of the typst project
   Return: ~
     (string) The path to the main file of the typst project.
 
-  Type: `function`,
-  Default: `function(path) return path end`
+  Type: `function`, Default: `function(path) return path end`
 
 *typst-preview.get_root*
 This function will be called to determine the root of the typst project
