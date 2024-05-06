@@ -37,6 +37,11 @@ function M.remove(path)
   return inventory.remove(path)
 end
 
+---Remove all servers
+function M.remove_all()
+  return inventory.remove_all()
+end
+
 ---Update a memory file.
 ---@param self Server
 ---@param path string

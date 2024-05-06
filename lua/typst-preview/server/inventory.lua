@@ -56,4 +56,12 @@ function M.remove(path)
   end
 end
 
+---Remove all servers
+function M.remove_all()
+  for path, _ in pairs(servers) do
+    M.remove(path)
+  end
+  servers = {}
+end
+
 return M

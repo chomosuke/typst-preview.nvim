@@ -161,8 +161,10 @@ function M.new(path, callback)
           local event = assert(vim.fn.json_decode(data:sub(1, s - 1)))
           data = data:sub(s + 1, -1)
           local listeners = server.listenerss[event.event]
-          for _, listener in pairs(listeners) do
-            listener(event)
+          if listeners ~= nil then
+            for _, listener in pairs(listeners) do
+              listener(event)
+            end
           end
         end
       end, 0)

@@ -9,7 +9,7 @@ local M = {}
 
 function M.create_commands()
   local function preview_off()
-    local path = M.get_buf_path(0)
+    local path = utils.get_buf_path(0)
 
     if path ~= '' and server.remove(config.opts.get_main_file(path)) then
       utils.print 'Preview stopped'
@@ -33,7 +33,7 @@ function M.create_commands()
       end
     end
 
-    local path = M.get_buf_path(0)
+    local path = utils.get_buf_path(0)
     if path == '' then
       print 'Can not preview an unsaved buffer.'
       return
@@ -58,7 +58,7 @@ function M.create_commands()
     preview_off()
   end, {})
   vim.api.nvim_create_user_command('TypstPreviewToggle', function()
-    local path = M.get_buf_path(0)
+    local path = utils.get_buf_path(0)
     if path ~= '' and server.get(config.opts.get_main_file(path)) then
       preview_off()
     else
