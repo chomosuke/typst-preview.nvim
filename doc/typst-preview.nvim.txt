@@ -54,7 +54,10 @@ CONTENTS                                         *typst-preview*
 
   Start or stop scrolling preview as cursor moves.
 
-  Calls: `require 'typst-preview'.set_follow_cursor(not init.get_follow_cursor())`.
+  Calls:
+  `require 'typst-preview'.set_follow_cursor(
+    not require 'typst-preview'.get_follow_cursor()
+  )`.
 
 *:TypstPreviewSyncCursor*
 
@@ -129,16 +132,30 @@ Set to `'always'` to enable.
 Set to `'auto'` to enable if environment (usually browser) has enabled darkmode.
   Type: `string`, Default: `'never'`
 
+*typst-preview.get_main_file*
+This function will be called to determine the main file of the typst project
+
+  Parameters: ~
+  - {path} (string) The path of the current buffer. This is the buffer that
+    was focused when `:TypstPreview` is called.
+
+  Return: ~
+    (string) The path to the main file of the typst project.
+
+  Type: `function`,
+  Default: `function(path) return path end`
+
 *typst-preview.get_root*
 This function will be called to determine the root of the typst project
 
   Parameters: ~
-  - {bufnr} (integer) The bufnr of the typst file that being previewed.
+  - {path} (string) The path to the main file. This is the string returned by
+    |typst-preview.get_main_file|.
 
   Return: ~
     (string) The path to the root of the typst project.
 
   Type: `function`,
-  Default: `function(bufnr_of_typst_buffer) return vim.fn.getcwd() end`
+  Default: `function(path) return vim.fn.fnamemodify(path_of_main_file, ':p:h') end`
 
 vim:tw=78:ts=2:sw=2:et:ft=help:norl:
