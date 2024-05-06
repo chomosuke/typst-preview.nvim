@@ -135,14 +135,14 @@ function M.notify(data, level)
 end
 
 ---get content of the buffer
----@param bufnr any
+---@param bufnr integer
 ---@return string content
 function M.get_buf_content(bufnr)
   return table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), '\n')
 end
 
 ---get content of the buffer
----@param bufnr any
+---@param bufnr integer
 ---@return string path
 function M.get_buf_path(bufnr)
   return vim.api.nvim_buf_get_name(bufnr)
