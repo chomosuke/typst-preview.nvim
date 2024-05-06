@@ -43,7 +43,7 @@ function M.create_commands()
     local s = server.get(path)
     if s == nil then
       server.init(path, function(ser)
-        events.watch(ser)
+        events.listen(ser)
       end)
     else
       print 'Opening another frontend'

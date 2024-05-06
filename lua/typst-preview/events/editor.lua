@@ -16,22 +16,9 @@ function M.get_follow_cursor()
   return config.opts.follow_cursor
 end
 
-local function sync_with_cursor(comm, bufnr)
-  local cursor = vim.api.nvim_win_get_cursor(0)
-  local line = cursor[1] - 1
-  comm.write(vim.fn.json_encode {
-    event = 'panelScrollTo',
-    filepath = server.get_buffer_path(bufnr),
-    line = line,
-    character = cursor[2],
-  } .. '\n')
-end
-
 ---Scroll preview to where cursor is regardless of preview scrolling mode
 function M.sync_with_cursor()
-  for _, comm in pairs(communicator.comms) do
-    sync_with_cursor(comm, vim.fn.bufnr())
-  end
+  -- TODO
 end
 
 ---register autocmds for this buffer to do the same for all comms
@@ -66,16 +53,13 @@ local function register_autocmds(bufnr)
         end
       end,
     },
-        {
-          event = 'BufUnload',
-          opts = {
-            callback = function()
-              -- preview_off is the source of truth of cleaning up everything.
-              preview_off(bufnr)
-            end,
-            buffer = bufnr,
-          },
-        },
+    {
+      event = 'BufUnload',
+      opts = {
+        callback = function() end,
+        buffer = bufnr,
+      },
+    },
   }
 
   for i, autocmd in pairs(autocmds) do

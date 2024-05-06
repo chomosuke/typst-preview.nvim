@@ -5,6 +5,8 @@ local M = {}
 ---@type { [string]: Server }
 local servers = {}
 
+---@param path string
+---@return string
 local function abs_path(path)
   return vim.fn.fnamemodify(path, ':p')
 end
