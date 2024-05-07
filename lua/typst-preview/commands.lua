@@ -2,14 +2,14 @@ local events = require 'typst-preview.events'
 local fetch = require 'typst-preview.fetch'
 local utils = require 'typst-preview.utils'
 local config = require 'typst-preview.config'
-local server = require 'typst-preview.server'
+local servers = require 'typst-preview.servers'
 
 local M = {}
 
 ---Scroll all preview to cursor position.
 function M.sync_with_cursor()
-  for _, ser in pairs(server.get_all()) do
-    server.sync_with_cursor(ser)
+  for _, ser in pairs(servers.get_all()) do
+    servers.sync_with_cursor(ser)
   end
 end
 
@@ -18,7 +18,7 @@ function M.create_commands()
   local function preview_off()
     local path = utils.get_buf_path(0)
 
-    if path ~= '' and server.remove(config.opts.get_main_file(path)) then
+    if path ~= '' and servers.remove(config.opts.get_main_file(path)) then
       utils.print 'Preview stopped'
     else
       utils.print 'Preview not running'
@@ -47,9 +47,9 @@ function M.create_commands()
     end
 
     path = config.opts.get_main_file(path)
-    local s = server.get(path)
+    local s = servers.get(path)
     if s == nil then
-      server.init(path, function(ser)
+      servers.init(path, function(ser)
         events.listen(ser)
       end)
     else
@@ -66,7 +66,7 @@ function M.create_commands()
   vim.api.nvim_create_user_command('TypstPreviewStop', preview_off, {})
   vim.api.nvim_create_user_command('TypstPreviewToggle', function()
     local path = utils.get_buf_path(0)
-    if path ~= '' and server.get(config.opts.get_main_file(path)) ~= nil then
+    if path ~= '' and servers.get(config.opts.get_main_file(path)) ~= nil then
       preview_off()
     else
       preview_on()

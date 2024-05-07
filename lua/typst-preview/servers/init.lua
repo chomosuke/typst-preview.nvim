@@ -1,5 +1,5 @@
 local utils = require 'typst-preview.utils'
-local inventory = require 'typst-preview.server.inventory'
+local inventory = require 'typst-preview.servers.inventory'
 local M = {
   init = inventory.init,
   get = inventory.get,

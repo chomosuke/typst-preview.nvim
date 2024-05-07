@@ -1,4 +1,4 @@
-local factory = require 'typst-preview.server.factory'
+local factory = require 'typst-preview.servers.factory'
 local utils = require 'typst-preview.utils'
 local M = {}
 
@@ -13,11 +13,15 @@ end
 
 ---Init a server
 ---@param path string
+---@param mode 'document'|'slide'
 ---@param callback fun(server: Server)
-function M.init(path, callback)
+function M.init(path, mode, callback)
   path = abs_path(path)
-  assert(servers[path] == nil, 'Server with path ' .. path .. ' already exist')
-  factory.new(path, function(server)
+  assert(
+    servers[path] == nil or #servers[path] < 2,
+    'Server with path ' .. path .. ' already exist'
+  )
+  factory.new(path, mode, function(server)
     servers[path] = server
     callback(servers[path])
   end)

@@ -7,9 +7,10 @@ local M = {}
 
 ---Spawn the server and connect to it using the websocat process
 ---@param path string
+---@param mode 'document'|'slide'
 ---@param callback fun(close: fun(), write: fun(data: string), read: fun(on_read: fun(data: string)), link: string)
 ---Called after server spawn completes
-local function spawn(path, callback)
+local function spawn(path, mode, callback)
   local server_stdout = assert(vim.loop.new_pipe())
   local server_stderr = assert(vim.loop.new_pipe())
   local typst_preview_bin = config.opts.dependencies_bin['typst-preview']
@@ -19,6 +20,8 @@ local function spawn(path, callback)
       '--partial-rendering',
       '--invert-colors',
       config.opts.invert_colors,
+      '--preview-mode',
+      mode,
       '--no-open',
       '--data-plane-host',
       '127.0.0.1:0',
@@ -141,9 +144,10 @@ end
 
 ---create a new Server
 ---@param path string
+---@param mode 'document'|'slide'
 ---@param callback fun(server: Server)
-function M.new(path, callback)
-  spawn(path, function(close, write, read, link)
+function M.new(path, mode, callback)
+  spawn(path, mode, function(close, write, read, link)
     ---@type Server
     local server = {
       path = path,

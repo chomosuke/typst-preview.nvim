@@ -1,4 +1,4 @@
-local server = require 'typst-preview.server'
+local servers = require 'typst-preview.servers'
 local utils = require 'typst-preview.utils'
 
 local M = {}
@@ -6,7 +6,7 @@ local M = {}
 ---Register event listener
 ---@param s Server
 function M.add_listeners(s)
-  server.listen_scroll(s, function(event)
+  servers.listen_scroll(s, function(event)
     local function editorScrollTo()
       utils.debug(event.end_.row .. ' ' .. event.end_.column)
       s.suppress = true
