@@ -103,7 +103,7 @@ function M.create_commands()
   end, {
     nargs = '?',
     complete = function(_, _, _)
-      return 'document\nslide'
+      return { 'document', 'slide' }
     end,
   })
   vim.api.nvim_create_user_command('TypstPreviewStop', preview_off, {})
