@@ -7,7 +7,7 @@ local M = {}
 
 ---Spawn the server and connect to it using the websocat process
 ---@param path string
----@param mode 'document'|'slide'
+---@param mode mode
 ---@param callback fun(close: fun(), write: fun(data: string), read: fun(on_read: fun(data: string)), link: string)
 ---Called after server spawn completes
 local function spawn(path, mode, callback)
@@ -144,13 +144,14 @@ end
 
 ---create a new Server
 ---@param path string
----@param mode 'document'|'slide'
+---@param mode mode
 ---@param callback fun(server: Server)
 function M.new(path, mode, callback)
   spawn(path, mode, function(close, write, read, link)
     ---@type Server
     local server = {
       path = path,
+      mode = mode,
       link = link,
       suppress = false,
       close = close,
