@@ -148,4 +148,15 @@ function M.get_buf_path(bufnr)
   return vim.api.nvim_buf_get_name(bufnr)
 end
 
+---get the length of a table
+---@param table table
+---@return integer
+function M.length(table)
+  local count = 0
+  for _ in pairs(table) do
+    count = count + 1
+  end
+  return count
+end
+
 return M
