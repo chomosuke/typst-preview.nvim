@@ -1,7 +1,7 @@
 local event_server = require 'typst-preview.events.server'
 local utils = require 'typst-preview.utils'
 local editor = require 'typst-preview.events.editor'
-local server = require 'typst-preview.server'
+local servers = require 'typst-preview.servers'
 
 local M = {}
 
@@ -27,7 +27,7 @@ function M.init()
     {
       event = 'VimLeavePre',
       opts = {
-        callback = server.remove_all,
+        callback = servers.remove_all,
       },
     },
   })

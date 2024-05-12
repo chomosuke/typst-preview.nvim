@@ -1,15 +1,19 @@
 local utils = require 'typst-preview.utils'
-local inventory = require 'typst-preview.server.inventory'
+local manager = require 'typst-preview.servers.manager'
 local M = {
-  init = inventory.init,
-  get = inventory.get,
-  get_all = inventory.get_all,
-  remove = inventory.remove,
-  remove_all = inventory.remove_all,
+  get_last_mode = manager.get_last_mode,
+  init = manager.init,
+  get = manager.get,
+  get_all = manager.get_all,
+  remove = manager.remove,
+  remove_all = manager.remove_all,
 }
+
+---@alias mode 'document'|'slide'
 
 ---@class (exact) Server
 ---@field path string Unsaved buffer will not be previewable.
+---@field mode mode
 ---@field link string
 ---@field suppress boolean Prevent server initiated event to trigger editor initiated events.
 ---@field close fun()

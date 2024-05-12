@@ -1,4 +1,4 @@
-local server = require 'typst-preview.server'
+local servers = require 'typst-preview.servers'
 local utils = require 'typst-preview.utils'
 local config= require 'typst-preview.config'
 
@@ -12,7 +12,7 @@ function M.register_autocmds(bufnr)
     {
       event = { 'TextChanged', 'TextChangedI', 'TextChangedP', 'InsertLeave' },
       callback = function(ser, _)
-        server.update_memory_file(
+        servers.update_memory_file(
           ser,
           utils.get_buf_path(bufnr),
           utils.get_buf_content(bufnr)
@@ -29,7 +29,7 @@ function M.register_autocmds(bufnr)
         if last_line ~= line then
           -- No scroll when on the same line in insert mode
           last_line = line
-          server.sync_with_cursor(ser)
+          servers.sync_with_cursor(ser)
         end
       end,
     },
@@ -41,7 +41,7 @@ function M.register_autocmds(bufnr)
         event = autocmd.event,
         opts = {
           callback = function(ev)
-            for _, ser in pairs(server.get_all()) do
+            for _, ser in pairs(servers.get_all()) do
               autocmd.callback(ser, ev)
             end
           end,

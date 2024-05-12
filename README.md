@@ -51,7 +51,8 @@ Plug 'chomosuke/typst-preview.nvim', {'tag': 'v0.3.*', do: ':TypstPreviewUpdate'
     - If you followed the installation instructions, your package manager should automatically run
       this for you.
 - `:TypstPreview`:
-  - Start the preview.
+  - Start the preview. Optionally, the desired preview mode can be specified:
+    `:TypstPreview document` (default) or `:TypstPreview slide` for slide mode.
 - `:TypstPreviewStop`:
   - Stop the preview.
 - `:TypstPreviewToggle`:

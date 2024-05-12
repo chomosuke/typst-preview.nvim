@@ -28,7 +28,11 @@ CONTENTS                                         *typst-preview*
 
 *:TypstPreview*
 
-  Start the preview.
+  Start the preview. Optionally, the desired preview mode can be specified:
+  `:TypstPreview document` (default) or `:TypstPreview slide` for slide mode.
+
+  If a preview is already running, will open another front end for that
+  preview.
 
 *:TypstPreviewStop*
 
@@ -37,6 +41,9 @@ CONTENTS                                         *typst-preview*
 *:TypstPreviewToggle*
 
   Toggle the preview.
+
+  If the preview has been opened before, will open the preview with the same
+  mode as last time.
 
 *:TypstPreviewFollowCursor*
 
