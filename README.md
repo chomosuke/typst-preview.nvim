@@ -80,6 +80,10 @@ require 'typst-preview'.setup {
   -- Setting this true will enable printing debug information with print()
   debug = false,
 
+  -- The port to use for the preview server
+  -- Setting this to `0` will use any free port
+  port = 0,
+
   -- Custom format string to open the output link provided with %s
   -- Example: open_cmd = 'firefox %s -P typst-preview --class typst-preview'
   open_cmd = nil,
