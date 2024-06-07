@@ -163,7 +163,7 @@ function M.new(path, mode, callback)
       vim.defer_fn(function()
         while data:len() > 0 do
           local s, _ = data:find '\n'
-          local event = assert(vim.fn.json_decode(data:sub(1, s - 1)))
+          local event = assert(vim.json.decode(data:sub(1, s - 1)))
           data = data:sub(s + 1, -1)
           local listeners = server.listenerss[event.event]
           if listeners ~= nil then

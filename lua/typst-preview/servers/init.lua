@@ -29,7 +29,7 @@ function M.update_memory_file(self, path, content)
     return
   end
   utils.debug('updating file: ' .. path .. ', main path: ' .. self.path)
-  self.write(vim.fn.json_encode {
+  self.write(vim.json.encode {
     event = 'updateMemoryFiles',
     files = {
       [path] = content,
@@ -45,7 +45,7 @@ function M.remove_memory_file(self, path)
     return
   end
   utils.debug('removing file: ' .. path)
-  self.write(vim.fn.json_encode {
+  self.write(vim.json.encode {
     event = 'removeMemoryFiles',
     files = { path },
   })
@@ -60,7 +60,7 @@ function M.sync_with_cursor(self)
   local cursor = vim.api.nvim_win_get_cursor(0)
   local line = cursor[1] - 1
   utils.debug('scroll to line: ' .. line .. ', character: ' .. cursor[2])
-  self.write(vim.fn.json_encode {
+  self.write(vim.json.encode {
     event = 'panelScrollTo',
     filepath = utils.get_buf_path(0),
     line = line,
