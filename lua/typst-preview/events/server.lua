@@ -10,10 +10,23 @@ function M.add_listeners(s)
     local function editorScrollTo()
       utils.debug(event.end_.row .. ' ' .. event.end_.column)
       s.suppress = true
-      vim.api.nvim_win_set_cursor(
-        0,
-        { event.end_.row + 1, event.end_.column - 1 }
-      )
+      local row = event.end_.row + 1
+      local max_row = vim.fn.line '$'
+      if row < 1 then
+        row = 1
+      end
+      if row > max_row then
+        row = max_row
+      end
+      local column = event.end_.column - 1
+      local max_column = vim.fn.col '$' - 1
+      if column < 0 then
+        column = 0
+      end
+      if column > max_column then
+        column = max_column
+      end
+      vim.api.nvim_win_set_cursor(0, { row, column })
       vim.defer_fn(function()
         s.suppress = false
       end, 100)
