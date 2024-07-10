@@ -139,6 +139,7 @@ Set this to false to stop the preview from scrolling as the cursor moves.
 *typst-preview.dependencies_bin*
 Provide the path to binaries for dependencies.
 Setting this will skip the download of the binary by the plugin.
+Setting this to `'tinymist'` if you're using tinymist.
 Warning: Be aware that your version might be older than the one
 required.
   Type: `table`, Default: `{['typst-preview'] = nil, ['websocat'] = nil}`
