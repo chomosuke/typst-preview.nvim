@@ -39,6 +39,8 @@ local function spawn(path, mode, callback)
     args = args,
     stdio = { nil, server_stdout, server_stderr },
   }))
+  utils.debug('spawning server ' .. typst_preview_bin .. ' with args:')
+  utils.debug(vim.inspect(args))
 
   -- This will be gradually filled util it's ready to be fed to callback
   -- Refactor if there's a third place callback would be called.
