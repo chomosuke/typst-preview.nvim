@@ -15,29 +15,28 @@ local function spawn(path, mode, callback)
   local server_stderr = assert(vim.loop.new_pipe())
   local typst_preview_bin = config.opts.dependencies_bin['typst-preview']
     or (utils.get_data_path() .. fetch.get_typst_bin_name())
-  local tinymist_arg = nil
-  if typst_preview_bin:find("tinymist") then
-    tinymist_arg = 'preview'
+  local args = {
+    '--partial-rendering',
+    '--invert-colors',
+    config.opts.invert_colors,
+    '--preview-mode',
+    mode,
+    '--no-open',
+    '--data-plane-host',
+    '127.0.0.1:0',
+    '--control-plane-host',
+    '127.0.0.1:0',
+    '--static-file-host',
+    '127.0.0.1:0',
+    '--root',
+    config.opts.get_root(path),
+    config.opts.get_main_file(path),
+  }
+  if typst_preview_bin:find 'tinymist' then
+    table.insert(args, 1, 'preview')
   end
   local server_handle, _ = assert(vim.loop.spawn(typst_preview_bin, {
-    args = {
-      tinymist_arg,
-      '--partial-rendering',
-      '--invert-colors',
-      config.opts.invert_colors,
-      '--preview-mode',
-      mode,
-      '--no-open',
-      '--data-plane-host',
-      '127.0.0.1:0',
-      '--control-plane-host',
-      '127.0.0.1:0',
-      '--static-file-host',
-      '127.0.0.1:0',
-      '--root',
-      config.opts.get_root(path),
-      config.opts.get_main_file(path),
-    },
+    args = args,
     stdio = { nil, server_stdout, server_stderr },
   }))
 
