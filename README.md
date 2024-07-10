@@ -97,6 +97,7 @@ require 'typst-preview'.setup {
   -- Warning: Be aware that your version might be older than the one
   -- required.
   dependencies_bin = {
+          -- if you are using tinymist, just set ['typst-preview'] = "tinymist".
           ['typst-preview'] = nil,
           ['websocat'] = nil
   },

@@ -15,8 +15,13 @@ local function spawn(path, mode, callback)
   local server_stderr = assert(vim.loop.new_pipe())
   local typst_preview_bin = config.opts.dependencies_bin['typst-preview']
     or (utils.get_data_path() .. fetch.get_typst_bin_name())
+  local tinymist_arg = nil
+  if typst_preview_bin:find("tinymist") then
+    tinymist_arg = 'preview'
+  end
   local server_handle, _ = assert(vim.loop.spawn(typst_preview_bin, {
     args = {
+      tinymist_arg,
       '--partial-rendering',
       '--invert-colors',
       config.opts.invert_colors,
