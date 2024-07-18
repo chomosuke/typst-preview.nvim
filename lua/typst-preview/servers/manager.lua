@@ -1,5 +1,6 @@
 local factory = require 'typst-preview.servers.factory'
 local utils = require 'typst-preview.utils'
+local config = require 'typst-preview.config'
 local M = {}
 
 ---There can not be `servers[path]` that's empty and not nil
@@ -8,6 +9,10 @@ local servers = {}
 
 ---@type { [string]: mode }
 local last_modes = {}
+
+--- Used static file links
+---@type { [string]: string }
+local links = {}
 
 ---Get last mode that init is called with
 ---@param path string
@@ -32,10 +37,22 @@ function M.init(path, mode, callback)
     servers[path] == nil or servers[path][mode] == nil,
     'Server with path ' .. path .. ' and mode ' .. mode .. ' already exist.'
   )
-  factory.new(path, mode, function(server)
+
+  local port = config.opts.port
+  local link = '127.0.0.1:' .. tostring(port)
+  if links[link] ~= nil then
+    utils.notify(
+      'Port ' .. port .. ' is already used by ' .. links[link],
+      vim.log.levels.ERROR
+    )
+    return
+  end
+
+  factory.new(path, mode, link, function(server)
     servers[path] = servers[path] or {}
     servers[path][mode] = server
     last_modes[path] = mode
+    links[server.link] = server.path
     callback(servers[path][mode])
   end)
 end
@@ -78,6 +95,7 @@ function M.remove(path)
       utils.debug(
         'Server with path ' .. path .. ' and mode ' .. mode .. ' closed.'
       )
+      links[servers[path][mode].link] = nil
       servers[path][mode] = nil
       removed = true
     end
