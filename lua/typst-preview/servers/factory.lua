@@ -35,6 +35,13 @@ local function spawn(path, mode, callback)
   if typst_preview_bin:find 'tinymist' then
     table.insert(args, 1, 'preview')
   end
+
+  if config.opts.extra_args ~= nil then
+    for _, v in ipairs(config.opts.extra_args) do
+      table.insert(args, v)
+    end
+  end
+
   local server_handle, _ = assert(vim.loop.spawn(typst_preview_bin, {
     args = args,
     stdio = { nil, server_stdout, server_stderr },
