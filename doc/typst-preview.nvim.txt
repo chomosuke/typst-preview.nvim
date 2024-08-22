@@ -130,6 +130,10 @@ Can be used to invert colors in preview.
 Set to `'never'` to disable.
 Set to `'always'` to enable.
 Set to `'auto'` to enable if environment (usually browser) has enabled darkmode.
+Set to '{"rest": "<option>","image": "<option>"}' where <option> means
+selecting one of the options above to specify separately for images and the 
+rest. Warning: only works with ['typst-preview'] = 'tinymist' in 
+typst-preview.dependencies_bin
   Type: `string`, Default: `'never'`
 
 *typst-preview.follow_cursor*
