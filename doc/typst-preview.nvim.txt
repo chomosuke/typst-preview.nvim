@@ -144,6 +144,11 @@ Warning: Be aware that your version might be older than the one
 required.
   Type: `table`, Default: `{['typst-preview'] = nil, ['websocat'] = nil}`
 
+*typst-preview.extra_args*
+A list of extra arguments (or nil) to be passed to previewer.
+For example, `{ "--input=ver=draft", "--ignore-system-fonts" }`
+  Type: `table`, Default: `nil`
+
 *typst-preview.get_main_file*
 This function will be called to determine the main file of the typst project
 

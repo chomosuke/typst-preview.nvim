@@ -8,6 +8,7 @@ local M = {
       ['typst-preview'] = nil,
       ['websocat'] = nil,
     },
+    extra_args = nil,
     get_root = function(path)
       return vim.fn.fnamemodify(path, ':p:h')
     end,

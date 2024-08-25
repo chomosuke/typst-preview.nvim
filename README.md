@@ -102,6 +102,10 @@ require 'typst-preview'.setup {
     ['websocat'] = nil
   },
 
+  -- A list of extra arguments (or nil) to be passed to previewer.
+  -- For example, extra_args = { "--input=ver=draft", "--ignore-system-fonts" }
+  extra_args = nil,
+
   -- This function will be called to determine the root of the typst project
   get_root = function(path_of_main_file)
     return vim.fn.fnamemodify(path_of_main_file, ':p:h')
