@@ -118,6 +118,7 @@ local function spawn(path, mode, callback)
     elseif server_output then
       local control_host =
         find_host(server_output, 'Control plane server listening on: ')
+        or find_host(server_output, 'Control panel server listening on: ')
       local static_host =
         find_host(server_output, 'Static file server listening on: ')
       if control_host then
