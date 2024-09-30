@@ -1,6 +1,7 @@
 local M = {
   opts = {
     debug = false,
+    port = 0,
     open_cmd = nil,
     invert_colors = 'never',
     follow_cursor = true,
