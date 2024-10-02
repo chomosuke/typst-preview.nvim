@@ -161,6 +161,8 @@ end
 ---@param mode mode
 ---@param callback fun(server: Server)
 function M.new(path, mode, callback)
+  local read_buffer = ''
+
   spawn(path, mode, function(close, write, read, link)
     ---@type Server
     local server = {
@@ -175,16 +177,25 @@ function M.new(path, mode, callback)
 
     read(function(data)
       vim.defer_fn(function()
-        while data:len() > 0 do
-          local s, _ = data:find '\n'
-          local event = assert(vim.json.decode(data:sub(1, s - 1)))
-          data = data:sub(s + 1, -1)
+        read_buffer = read_buffer .. data
+        local s, _ = read_buffer:find '\n'
+        while s ~= nil do
+          local event = assert(vim.json.decode(read_buffer:sub(1, s - 1)))
+
+          -- Make sure we keep the next message in the read buffer
+          read_buffer = read_buffer:sub(s + 1, -1)
+          s, _ = read_buffer:find '\n'
+
           local listeners = server.listenerss[event.event]
           if listeners ~= nil then
             for _, listener in pairs(listeners) do
               listener(event)
             end
           end
+        end
+
+        if read_buffer ~= '' then
+          print('Leaving for next read: '..read_buffer)
         end
       end, 0)
     end)
