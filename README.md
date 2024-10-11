@@ -19,7 +19,7 @@ https://github.com/chomosuke/typst-preview.nvim/assets/38484873/9f8ecf0f-aa1c-4e
 {
   'chomosuke/typst-preview.nvim',
   lazy = false, -- or ft = 'typst'
-  version = '0.4.*',
+  version = '1.*',
   build = function() require 'typst-preview'.update() end,
 }
 ```
@@ -29,7 +29,7 @@ https://github.com/chomosuke/typst-preview.nvim/assets/38484873/9f8ecf0f-aa1c-4e
 ```lua
 use {
   'chomosuke/typst-preview.nvim',
-  tag = 'v0.4.*',
+  tag = 'v1.*',
   run = function() require 'typst-preview'.update() end,
 }
 ```
