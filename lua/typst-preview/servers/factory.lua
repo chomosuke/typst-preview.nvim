@@ -195,7 +195,7 @@ function M.new(path, mode, callback)
         end
 
         if read_buffer ~= '' then
-          print('Leaving for next read: '..read_buffer)
+          utils.debug('Leaving for next read: '..read_buffer)
         end
       end, 0)
     end)
