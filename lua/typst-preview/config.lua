@@ -5,7 +5,7 @@ local M = {
     invert_colors = 'never',
     follow_cursor = true,
     dependencies_bin = {
-      ['typst-preview'] = nil,
+      ['tinymist'] = nil,
       ['websocat'] = nil,
     },
     extra_args = nil,
