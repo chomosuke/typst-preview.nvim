@@ -45,16 +45,16 @@ function M.get_typst_bin_name()
   if M.typst_bin_name == nil then
     M.typst_bin_name = get_bin_name {
       macos = {
-        arm64 = 'typst-preview-darwin-arm64',
-        x64 = 'typst-preview-darwin-x64',
+        arm64 = 'tinymist-darwin-arm64',
+        x64 = 'tinymist-darwin-x64',
       },
       linux = {
-        arm64 = 'typst-preview-linux-arm64',
-        x64 = 'typst-preview-linux-x64',
+        arm64 = 'tinymist-linux-arm64',
+        x64 = 'tinymist-linux-x64',
       },
       windows = {
-        arm64 = 'typst-preview-win32-arm64.exe',
-        x64 = 'typst-preview-win32-x64.exe',
+        arm64 = 'tinymist-win32-arm64.exe',
+        x64 = 'tinymist-win32-x64.exe',
       },
     }
   end
@@ -162,10 +162,10 @@ end
 function M.bins_to_fetch()
   return {
     {
-      url = 'https://github.com/Enter-tainer/typst-preview/releases/download/v0.11.7/'
+      url = 'https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.11.32/'
         .. M.get_typst_bin_name(),
       bin_name = M.get_typst_bin_name(),
-      name = 'typst-preview',
+      name = 'tinymist',
     },
     {
       url = 'https://github.com/vi/websocat/releases/download/v1.12.0/'

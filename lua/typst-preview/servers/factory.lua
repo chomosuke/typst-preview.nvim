@@ -13,9 +13,10 @@ local M = {}
 local function spawn(path, mode, callback)
   local server_stdout = assert(vim.loop.new_pipe())
   local server_stderr = assert(vim.loop.new_pipe())
-  local typst_preview_bin = config.opts.dependencies_bin['typst-preview']
+  local tinymist_bin = config.opts.dependencies_bin['tinymist']
     or (utils.get_data_path() .. fetch.get_typst_bin_name())
   local args = {
+    'preview',
     '--partial-rendering',
     '--invert-colors',
     config.opts.invert_colors,
@@ -32,9 +33,6 @@ local function spawn(path, mode, callback)
     config.opts.get_root(path),
     config.opts.get_main_file(path),
   }
-  if typst_preview_bin:find 'tinymist' then
-    table.insert(args, 1, 'preview')
-  end
 
   if config.opts.extra_args ~= nil then
     for _, v in ipairs(config.opts.extra_args) do
@@ -42,11 +40,11 @@ local function spawn(path, mode, callback)
     end
   end
 
-  local server_handle, _ = assert(vim.loop.spawn(typst_preview_bin, {
+  local server_handle, _ = assert(vim.loop.spawn(tinymist_bin, {
     args = args,
     stdio = { nil, server_stdout, server_stderr },
   }))
-  utils.debug('spawning server ' .. typst_preview_bin .. ' with args:')
+  utils.debug('spawning server ' .. tinymist_bin .. ' with args:')
   utils.debug(vim.inspect(args))
 
   -- This will be gradually filled util it's ready to be fed to callback
