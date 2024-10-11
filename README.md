@@ -89,7 +89,7 @@ require 'typst-preview'.setup {
   -- dark mode
   -- Setting this to '{"rest": "<option>","image": "<option>"}' will apply
   -- your choice of color inversion to images and everything else
-  -- separately. Only works with the tinymist binary.
+  -- separately.
   invert_colors = 'never',
 
   -- Whether the preview will follow the cursor in the source file
