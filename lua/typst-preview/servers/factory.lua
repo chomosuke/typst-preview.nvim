@@ -14,7 +14,7 @@ local function spawn(path, mode, callback)
   local server_stdout = assert(vim.loop.new_pipe())
   local server_stderr = assert(vim.loop.new_pipe())
   local tinymist_bin = config.opts.dependencies_bin['tinymist']
-    or (utils.get_data_path() .. fetch.get_typst_bin_name())
+    or (utils.get_data_path() .. fetch.get_tinymist_bin_name())
   local args = {
     'preview',
     '--partial-rendering',

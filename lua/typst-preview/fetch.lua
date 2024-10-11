@@ -2,11 +2,11 @@ local utils = require 'typst-preview.utils'
 local config = require 'typst-preview.config'
 
 -- Responsible for downloading all required binary.
--- Currently includes typst-preview and websocat
+-- Currently includes tinymist and websocat
 local M = {
   -- Exposing this so when platform detection fails user can manually set
   -- bin_name
-  typst_bin_name = nil,
+  tinymist_bin_name = nil,
   websocat_bin_name = nil,
 }
 
@@ -39,11 +39,11 @@ local function get_bin_name(map)
   return map[os][machine]
 end
 
----Get name of typst-preview binary, this is also the name for the github asset to download.
+---Get name of tinymist binary, this is also the name for the github asset to download.
 ---@return string name
-function M.get_typst_bin_name()
-  if M.typst_bin_name == nil then
-    M.typst_bin_name = get_bin_name {
+function M.get_tinymist_bin_name()
+  if M.tinymist_bin_name == nil then
+    M.tinymist_bin_name = get_bin_name {
       macos = {
         arm64 = 'tinymist-darwin-arm64',
         x64 = 'tinymist-darwin-x64',
@@ -58,7 +58,7 @@ function M.get_typst_bin_name()
       },
     }
   end
-  return M.typst_bin_name
+  return M.tinymist_bin_name
 end
 
 ---Get name of websocat binary, this is also the name for the github asset to download.
@@ -163,8 +163,8 @@ function M.bins_to_fetch()
   return {
     {
       url = 'https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.11.32/'
-        .. M.get_typst_bin_name(),
-      bin_name = M.get_typst_bin_name(),
+        .. M.get_tinymist_bin_name(),
+      bin_name = M.get_tinymist_bin_name(),
       name = 'tinymist',
     },
     {
