@@ -1,6 +1,6 @@
 <h1 align="center"> ✨ Typst Preview for Neovim ✨ </h1>
 
-The Neovim plugin for [Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview).
+The Neovim plugin for [Myriad-Dreamin/tinymist](https://github.com/Myriad-Dreamin/tinymist).
 
 https://github.com/chomosuke/typst-preview.nvim/assets/38484873/9f8ecf0f-aa1c-4edb-85a9-96a8005e8f25
 
@@ -19,7 +19,7 @@ https://github.com/chomosuke/typst-preview.nvim/assets/38484873/9f8ecf0f-aa1c-4e
 {
   'chomosuke/typst-preview.nvim',
   lazy = false, -- or ft = 'typst'
-  version = '0.3.*',
+  version = '0.4.*',
   build = function() require 'typst-preview'.update() end,
 }
 ```
@@ -29,7 +29,7 @@ https://github.com/chomosuke/typst-preview.nvim/assets/38484873/9f8ecf0f-aa1c-4e
 ```lua
 use {
   'chomosuke/typst-preview.nvim',
-  tag = 'v0.3.*',
+  tag = 'v0.4.*',
   run = function() require 'typst-preview'.update() end,
 }
 ```
@@ -37,7 +37,7 @@ use {
 **vim-plug:**
 
 ```vim
-Plug 'chomosuke/typst-preview.nvim', {'tag': 'v0.3.*', do: ':TypstPreviewUpdate'}
+Plug 'chomosuke/typst-preview.nvim', {'tag': 'v0.4.*', do: ':TypstPreviewUpdate'}
 ```
 
 ## 🚀 Usage
@@ -100,8 +100,7 @@ require 'typst-preview'.setup {
   -- Warning: Be aware that your version might be older than the one
   -- required.
   dependencies_bin = {
-    -- if you are using tinymist, just set ['typst-preview'] = "tinymist".
-    ['typst-preview'] = nil,
+    ['tinymist'] = nil,
     ['websocat'] = nil
   },
 
@@ -141,6 +140,8 @@ All PRs are welcome.
 ## Credit
 
 This plugin wouldn't be possible without the work of
-[Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview). If you like this plugin
-enough to star it, please consider starring
-[Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview) as well.
+[Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview) and
+[Myriad-Dreamin/tinymist](https://github.com/Myriad-Dreamin/tinymist). If you
+like this plugin enough to star it, please consider starring
+[Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview) and
+[Myriad-Dreamin/tinymist](https://github.com/Myriad-Dreamin/tinymist) as well.
