@@ -7,6 +7,12 @@ assignees: chomosuke
 
 ---
 
+**Before you start**
+- [ ] You've headed over to
+  [tinymist](https://github.com/Myriad-Dreamin/tinymist) and can confirm that
+  the issue does not exist with the [VS Code plugin for
+  tinymist](https://marketplace.visualstudio.com/items?itemName=myriad-dreamin.tinymist).
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
