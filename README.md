@@ -37,7 +37,7 @@ use {
 **vim-plug:**
 
 ```vim
-Plug 'chomosuke/typst-preview.nvim', {'tag': 'v1.*', do: ':TypstPreviewUpdate'}
+Plug 'chomosuke/typst-preview.nvim', {'tag': 'v0.3.*'}
 ```
 
 ## 🚀 Usage
