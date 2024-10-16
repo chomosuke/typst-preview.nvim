@@ -3,35 +3,35 @@ local M = {}
 
 ---check if the host system is windows
 function M.is_windows()
-  return vim.loop.os_uname().sysname == 'Windows_NT'
+  return vim.uv.os_uname().sysname == 'Windows_NT'
 end
 
 ---check if the host system is macos
 function M.is_macos()
-  return vim.loop.os_uname().sysname == 'Darwin'
+  return vim.uv.os_uname().sysname == 'Darwin'
 end
 
 ---check if the host system is linux
 function M.is_linux()
-  return vim.loop.os_uname().sysname == 'Linux'
+  return vim.uv.os_uname().sysname == 'Linux'
 end
 
 ---check if the host system is wsl
 function M.is_wsl()
-  return M.is_linux() and vim.loop.os_uname().release:lower():find 'microsoft'
+  return M.is_linux() and vim.uv.os_uname().release:lower():find 'microsoft'
 end
 
 -- Stolen from mason.nvim
 
 ---check if the host arch is x64
 function M.is_x64()
-  local machine = vim.loop.os_uname().machine
+  local machine = vim.uv.os_uname().machine
   return machine == 'x86_64' or machine == 'x64'
 end
 
 ---check if the host arch is arm64
 function M.is_arm64()
-  local machine = vim.loop.os_uname().machine
+  local machine = vim.uv.os_uname().machine
   return machine == 'aarch64'
     or machine == 'aarch64_be'
     or machine == 'armv8b'

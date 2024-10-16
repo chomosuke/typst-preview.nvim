@@ -31,7 +31,7 @@ local function get_bin_name(map)
       "typst-preview can't figure out your platform.\n"
         .. 'Please report this bug.\n'
         .. 'os_uname: '
-        .. vim.inspect(vim.loop.os_uname()),
+        .. vim.inspect(vim.uv.os_uname()),
       vim.log.levels.ERROR
     )
   end
@@ -124,10 +124,10 @@ local function download_bin(bin, callback)
   local url = bin.url
 
   local stdin = nil
-  local stdout = assert(vim.loop.new_pipe())
-  local stderr = assert(vim.loop.new_pipe())
+  local stdout = assert(vim.uv.new_pipe())
+  local stderr = assert(vim.uv.new_pipe())
   -- TODO add wget support
-  vim.loop.spawn('curl', {
+  vim.uv.spawn('curl', {
     args = { '-L', url, '--create-dirs', '--output', path, '--progress-bar' },
     stdio = { stdin, stdout, stderr },
   }, function(code, _)
@@ -138,7 +138,7 @@ local function download_bin(bin, callback)
     else
       if not utils.is_windows() then
         -- Set executable permission
-        vim.loop.spawn('chmod', { args = { '+x', path } }, callback)
+        vim.uv.spawn('chmod', { args = { '+x', path } }, callback)
       else
         callback()
       end

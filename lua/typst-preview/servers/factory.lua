@@ -11,8 +11,8 @@ local M = {}
 ---@param callback fun(close: fun(), write: fun(data: string), read: fun(on_read: fun(data: string)), link: string)
 ---Called after server spawn completes
 local function spawn(path, mode, callback)
-  local server_stdout = assert(vim.loop.new_pipe())
-  local server_stderr = assert(vim.loop.new_pipe())
+  local server_stdout = assert(vim.uv.new_pipe())
+  local server_stderr = assert(vim.uv.new_pipe())
   local tinymist_bin = config.opts.dependencies_bin['tinymist']
     or (utils.get_data_path() .. fetch.get_tinymist_bin_name())
   local args = {
@@ -40,7 +40,7 @@ local function spawn(path, mode, callback)
     end
   end
 
-  local server_handle, _ = assert(vim.loop.spawn(tinymist_bin, {
+  local server_handle, _ = assert(vim.uv.spawn(tinymist_bin, {
     args = args,
     stdio = { nil, server_stdout, server_stderr },
   }))
@@ -53,13 +53,13 @@ local function spawn(path, mode, callback)
   local callback_param = nil
 
   local function connect(host)
-    local stdin = assert(vim.loop.new_pipe())
-    local stdout = assert(vim.loop.new_pipe())
-    local stderr = assert(vim.loop.new_pipe())
+    local stdin = assert(vim.uv.new_pipe())
+    local stdout = assert(vim.uv.new_pipe())
+    local stderr = assert(vim.uv.new_pipe())
     local addr = 'ws://' .. host .. '/'
     local websocat_bin = config.opts.dependencies_bin['websocat']
       or (utils.get_data_path() .. fetch.get_websocat_bin_name())
-    local websocat_handle, _ = assert(vim.loop.spawn(websocat_bin, {
+    local websocat_handle, _ = assert(vim.uv.spawn(websocat_bin, {
       args = {
         '-B',
         '10000000',
