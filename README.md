@@ -13,6 +13,9 @@ https://github.com/chomosuke/typst-preview.nvim/assets/38484873/9f8ecf0f-aa1c-4e
 
 ## 📦 Installation
 
+#### Dependencies
+- curl
+
 **Lazy.nvim:**
 
 ```lua
