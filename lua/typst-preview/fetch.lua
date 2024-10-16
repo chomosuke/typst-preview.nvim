@@ -143,7 +143,7 @@ local function download_bin(bin, callback)
   end
 
   -- TODO add wget support
-  local handle, err = vim.uv.spawn('curll', {
+  local handle, err = vim.uv.spawn('curl', {
     args = { '-L', url, '--create-dirs', '--output', path, '--progress-bar' },
     stdio = { stdin, stdout, stderr },
   }, after_curl)
