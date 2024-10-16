@@ -126,11 +126,8 @@ local function download_bin(bin, callback)
   local stdin = nil
   local stdout = assert(vim.uv.new_pipe())
   local stderr = assert(vim.uv.new_pipe())
-  -- TODO add wget support
-  vim.uv.spawn('curl', {
-    args = { '-L', url, '--create-dirs', '--output', path, '--progress-bar' },
-    stdio = { stdin, stdout, stderr },
-  }, function(code, _)
+
+  local function after_curl(code)
     if code ~= 0 then
       utils.notify(
         'Downloading ' .. name .. ' binary failed, exit code: ' .. code
@@ -143,7 +140,22 @@ local function download_bin(bin, callback)
         callback()
       end
     end
-  end)
+  end
+
+  -- TODO add wget support
+  local handle, err = vim.uv.spawn('curll', {
+    args = { '-L', url, '--create-dirs', '--output', path, '--progress-bar' },
+    stdio = { stdin, stdout, stderr },
+  }, after_curl)
+
+  if handle == nil then
+    utils.notify(
+      'Launching curl failed: '
+        .. err
+        .. '\nMake sure curl is installed on the system.'
+    )
+  end
+
   local function read_progress(err, data)
     if err then
       error(err)
