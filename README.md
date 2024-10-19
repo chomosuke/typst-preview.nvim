@@ -1,4 +1,7 @@
-<h1 align="center"> ✨ Typst Preview for Neovim ✨ </h1>
+<div align="center">
+	<img alt="Logo that represents the split screen workflow: an eye with NeoVim colours on one half (coding) and black and white on the other (preview); Typst’s logo is in the iris" src="assets/typst-preview-neovim.svg" style="width: 10em; border-radius: 1em;" />
+	<h1> ✨ Typst Preview for Neovim ✨ </h1>
+</div>
 
 The Neovim plugin for [Myriad-Dreamin/tinymist](https://github.com/Myriad-Dreamin/tinymist).
 
