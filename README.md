@@ -46,6 +46,9 @@ use {
 Plug 'chomosuke/typst-preview.nvim', {'tag': 'v1.*'}
 ```
 
+**Note:** You can pin typst's minor version by pinning the minor version of this
+plugin, i.e., `v1.1.*` instead of `v1.*`.
+
 ## 🚀 Usage
 
 ### Commands / Functions:
