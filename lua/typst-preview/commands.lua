@@ -37,16 +37,20 @@ function M.create_commands()
 
   ---@param mode mode?
   local function preview_on(mode)
-    -- check if binaries are available and tell them to fetch first
+    -- Check for missing or outdated binaries
     for _, bin in pairs(fetch.bins_to_fetch()) do
       if
         not fetch.up_to_date(bin) and not config.opts.dependencies_bin[bin.name]
       then
         utils.notify(
-          bin.name
-            .. ' not found or out of date\nPlease run :TypstPreviewUpdate first!',
-          vim.log.levels.ERROR
+          string.format("The binary '%s' is missing or outdated", bin.name),
+          vim.log.levels.WARN
         )
+        utils.notify(
+          'Downloading the required binaries\nPlease rerun the preview command once the download is complete',
+          vim.log.levels.INFO
+        )
+        fetch.fetch(nil)
         return
       end
     end
