@@ -9,8 +9,12 @@ local M = {
       ['websocat'] = nil,
     },
     extra_args = nil,
-    get_root = function(path)
-      return vim.fn.fnamemodify(path, ':p:h')
+    get_root = function(path_of_main_file)
+      local root = os.getenv 'TYPST_ROOT'
+      if root then
+        return root
+      end
+      return vim.fn.fnamemodify(path_of_main_file, ':p:h')
     end,
     get_main_file = function(path)
       return path
