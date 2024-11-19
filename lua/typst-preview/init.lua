@@ -3,8 +3,8 @@ local fetch = require 'typst-preview.fetch'
 local commands = require 'typst-preview.commands'
 
 local M = {
-  setup = function()
-    config.config()
+  setup = function(opts)
+    config.config(opts)
     fetch.fetch(true)
   end,
   set_follow_cursor = config.set_follow_cursor,
