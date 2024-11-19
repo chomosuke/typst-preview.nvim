@@ -71,7 +71,7 @@ function M.create_commands()
   end
 
   vim.api.nvim_create_user_command('TypstPreviewUpdate', function()
-    fetch.fetch(nil)
+    fetch.fetch(false)
   end, {})
 
   vim.api.nvim_create_user_command('TypstPreview', function(opts)

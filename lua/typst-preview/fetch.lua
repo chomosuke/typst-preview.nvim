@@ -102,21 +102,25 @@ function M.up_to_date(bin)
   return false
 end
 
-local function download_bin(bin, callback)
+local function download_bin(bin, quiet, callback)
   local path = get_path(bin.bin_name)
   if config.opts.dependencies_bin[bin.name] then
-    print(
-      "Binary for '"
-        .. bin.name
-        .. "' has been provided in config.\n"
-        .. 'Please ensure manually that it is up to date.\n'
-    )
-    callback()
+    if not quiet then
+      print(
+        "Binary for '"
+          .. bin.name
+          .. "' has been provided in config.\n"
+          .. 'Please ensure manually that it is up to date.\n'
+      )
+    end
+    callback(false)
     return
   end
   if M.up_to_date(bin) then
-    print(bin.name .. ' already up to date.' .. '\n')
-    callback()
+    if not quiet then
+      print(bin.name .. ' already up to date.' .. '\n')
+    end
+    callback(false)
     return
   end
 
@@ -135,9 +139,11 @@ local function download_bin(bin, callback)
     else
       if not utils.is_windows() then
         -- Set executable permission
-        vim.uv.spawn('chmod', { args = { '+x', path } }, callback)
+        vim.uv.spawn('chmod', { args = { '+x', path } }, function()
+          callback(true)
+        end)
       else
-        callback()
+        callback(true)
       end
     end
   end
@@ -189,16 +195,20 @@ function M.bins_to_fetch()
 end
 
 ---Download all binaries and other needed artifact to utils.get_data_path()
+---@param quiet boolean
 ---@param callback function|nil
-function M.fetch(callback)
+function M.fetch(quiet, callback)
   if callback == nil then
     callback = function() end
   end
+  local downloaded = 0
   local function finish()
-    print(
-      'All binaries required by typst-preview downloaded to '
-        .. utils.get_data_path()
-    )
+    if downloaded > 0 then
+      print(
+        'All binaries required by typst-preview downloaded to '
+          .. utils.get_data_path()
+      )
+    end
     local record, err = io.open(record_path, 'w')
     if record == nil then
       error("Can't open record file!: " .. err)
@@ -216,7 +226,10 @@ function M.fetch(callback)
       return
     end
     local bin = table.remove(bins, 1)
-    download_bin(bin, function()
+    download_bin(bin, quiet, function(did_download)
+      if did_download then
+        downloaded = downloaded + 1
+      end
       download_bins(bins, finish)
     end)
   end

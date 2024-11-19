@@ -26,7 +26,9 @@ https://github.com/chomosuke/typst-preview.nvim/assets/38484873/9f8ecf0f-aa1c-4e
   'chomosuke/typst-preview.nvim',
   lazy = false, -- or ft = 'typst'
   version = '1.*',
-  build = function() require 'typst-preview'.update() end,
+  config = function()
+    require 'typst-preview'.setup {}
+  end,
 }
 ```
 
@@ -36,7 +38,9 @@ https://github.com/chomosuke/typst-preview.nvim/assets/38484873/9f8ecf0f-aa1c-4e
 use {
   'chomosuke/typst-preview.nvim',
   tag = 'v1.*',
-  run = function() require 'typst-preview'.update() end,
+  config = function()
+    require 'typst-preview'.setup {}
+  end,
 }
 ```
 
@@ -80,7 +84,9 @@ plugin, i.e., `v1.1.*` instead of `v1.*`.
 
 ## ⚙️ Configuration
 
-This plugin should work out of the box with no configuration. Call to `setup()` is not required.
+This plugin should work out of the box with no configuration. However, calling
+`setup()` is required to ensure that the binaries that the plugin depends on are
+downloaded and up to date.
 
 ### Default
 
