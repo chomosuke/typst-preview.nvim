@@ -40,7 +40,7 @@ function M.create_commands()
     -- check if binaries are available and tell them to fetch first
     for _, bin in pairs(fetch.bins_to_fetch()) do
       if
-        not fetch.up_to_date(bin) and not config.opts.dependencies_bin[bin.name]
+        config.opts.dependencies_bin[bin.name] ~= nil and not fetch.up_to_date(bin)
       then
         utils.notify(
           bin.name

@@ -209,14 +209,22 @@ function M.fetch(quiet, callback)
           .. utils.get_data_path()
       )
     end
-    local record, err = io.open(record_path, 'w')
-    if record == nil then
-      error("Can't open record file!: " .. err)
-    end
+    local record_required = true
     for _, bin in pairs(M.bins_to_fetch()) do
-      record:write(bin.url .. '\n')
+      if config.opts.dependencies_bin[bin.name] ~= nil then
+        record_required = false
+      end
     end
-    record:close()
+    if record_required then
+      local record, err = io.open(record_path, 'w')
+      if record == nil then
+        error("Can't open record file!: " .. err)
+      end
+      for _, bin in pairs(M.bins_to_fetch()) do
+        record:write(bin.url .. '\n')
+      end
+      record:close()
+    end
     callback()
   end
 
