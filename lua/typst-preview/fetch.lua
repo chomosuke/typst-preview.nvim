@@ -209,11 +209,17 @@ function M.fetch(quiet, callback)
           .. utils.get_data_path()
       )
     end
+    local bins_to_fetch = {}
+    for _, bin in pairs(M.bins_to_fetch()) do
+      if config.opts.dependencies_bin[bin.name] == nil then
+        table.insert(bins_to_fetch, bin)
+      end
+    end
     local record, err = io.open(record_path, 'w')
     if record == nil then
       error("Can't open record file!: " .. err)
     end
-    for _, bin in pairs(M.bins_to_fetch()) do
+    for _, bin in pairs(bins_to_fetch) do
       record:write(bin.url .. '\n')
     end
     record:close()
@@ -234,6 +240,7 @@ function M.fetch(quiet, callback)
     end)
   end
 
+  vim.fn.mkdir(utils.get_data_path(), 'p')
   download_bins(M.bins_to_fetch(), finish)
 end
 
