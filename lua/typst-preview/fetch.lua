@@ -215,14 +215,11 @@ function M.fetch(quiet, callback)
         table.insert(bins_to_fetch, bin)
       end
     end
-    local record, err
+    local record, err = io.open(record_path, 'w')
+    if record == nil then
+      error("Can't open record file!: " .. err)
+    end
     for _, bin in pairs(bins_to_fetch) do
-      if record == nil then
-        record, err = io.open(record_path, 'w')
-      end
-      if record == nil then
-        error("Can't open record file!: " .. err)
-      end
       record:write(bin.url .. '\n')
     end
     record:close()
@@ -243,6 +240,7 @@ function M.fetch(quiet, callback)
     end)
   end
 
+  vim.fn.mkdir(utils.get_data_path(), 'p')
   download_bins(M.bins_to_fetch(), finish)
 end
 
