@@ -140,6 +140,11 @@ require 'typst-preview'.setup {
 }
 ```
 
+### Use tinymist installed from Mason
+Set `dependencies_bin` option to
+`dependencies_bin = { ['tinymist'] = 'tinymist' }` should point towards the
+Mason installation of tinymist.
+
 ## ❓ Comparison with other tools
 
 The author of [Enter-tainer/typst-preview](https://github.com/Enter-tainer/typst-preview) wrote a
