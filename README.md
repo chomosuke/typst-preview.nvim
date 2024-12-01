@@ -26,9 +26,7 @@ https://github.com/chomosuke/typst-preview.nvim/assets/38484873/9f8ecf0f-aa1c-4e
   'chomosuke/typst-preview.nvim',
   lazy = false, -- or ft = 'typst'
   version = '1.*',
-  config = function()
-    require 'typst-preview'.setup {}
-  end,
+  opts = {},
 }
 ```
 
