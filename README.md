@@ -60,9 +60,8 @@ plugin, i.e., `v1.1.*` instead of `v1.*`.
 - `:TypstPreviewUpdate` or `require 'typst-preview'.update()`:
   - Download the necessary binaries to
     `vim.fn.fnamemodify(vim.fn.stdpath 'data' .. '/typst-preview/', ':p')`.
-  - This must be run before any other commands can be run.
-    - If you followed the installation instructions, your package manager should automatically run
-      this for you.
+  - This must be run before any other commands can be run. It is implicitly ran
+    when calling `setup {}`.
 - `:TypstPreview`:
   - Start the preview. Optionally, the desired preview mode can be specified:
     `:TypstPreview document` (default) or `:TypstPreview slide` for slide mode.
