@@ -39,7 +39,7 @@ function M.init(path, mode, callback)
   )
 
   local port = config.opts.port
-  local link = '127.0.0.1:' .. tostring(port)
+  local link = '0.0.0.0:' .. tostring(port)
   if links[link] ~= nil then
     utils.notify(
       'Port ' .. port .. ' is already used by ' .. links[link],
