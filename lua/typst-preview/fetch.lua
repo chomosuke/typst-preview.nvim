@@ -180,13 +180,13 @@ end
 function M.bins_to_fetch()
   return {
     {
-      url = 'https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.12.4/'
+      url = 'https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.12.10/'
         .. M.get_tinymist_bin_name(),
       bin_name = M.get_tinymist_bin_name(),
       name = 'tinymist',
     },
     {
-      url = 'https://github.com/vi/websocat/releases/download/v1.12.0/'
+      url = 'https://github.com/vi/websocat/releases/download/v1.14.0/'
         .. M.get_websocat_bin_name(),
       bin_name = M.get_websocat_bin_name(),
       name = 'websocat',
