@@ -89,7 +89,8 @@ downloaded and up to date.
 
 ```lua
 require 'typst-preview'.setup {
-  -- Setting this true will enable printing debug information with print()
+  -- Setting this true will enable logging debug information to
+  -- `vim.fn.stdpath 'data' .. '/typst-preview/log.txt'`
   debug = false,
 
   -- Custom format string to open the output link provided with %s

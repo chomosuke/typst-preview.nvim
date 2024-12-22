@@ -33,10 +33,10 @@ end
 function M.is_arm64()
   local machine = vim.uv.os_uname().machine
   return machine == 'aarch64'
-    or machine == 'aarch64_be'
-    or machine == 'armv8b'
-    or machine == 'armv8l'
-    or machine == 'arm64'
+      or machine == 'aarch64_be'
+      or machine == 'armv8b'
+      or machine == 'armv8l'
+      or machine == 'arm64'
 end
 
 local open_cmd
@@ -85,7 +85,9 @@ end
 ---Get the path to store all persistent datas
 ---@return string path
 function M.get_data_path()
-  return vim.fn.fnamemodify(vim.fn.stdpath 'data' .. '/typst-preview/', ':p')
+  local path = vim.fn.fnamemodify(vim.fn.stdpath 'data' .. '/typst-preview/', ':p')
+  vim.fn.mkdir(path, 'p')
+  return path
 end
 
 ---@class AutocmdOpts
@@ -117,11 +119,20 @@ function M.print(data)
   end, 0)
 end
 
+local file = nil
+
 ---print that only work when opts.debug = true
 ---@param data string
 function M.debug(data)
   if config.opts.debug then
-    M.print(data)
+    local err
+    if file == nil then
+      file, err = io.open(M.get_data_path() .. 'log.txt', "a")
+    end
+    if file == nil then
+      error("Can't open record file!: " .. err)
+    end
+    file:write(data .. '\n')
   end
 end
 

@@ -240,7 +240,6 @@ function M.fetch(quiet, callback)
     end)
   end
 
-  vim.fn.mkdir(utils.get_data_path(), 'p')
   download_bins(M.bins_to_fetch(), finish)
 end
 
