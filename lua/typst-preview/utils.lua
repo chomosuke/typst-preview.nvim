@@ -85,10 +85,9 @@ end
 ---Get the path to store all persistent datas
 ---@return string path
 function M.get_data_path()
-  local path = vim.fn.fnamemodify(vim.fn.stdpath 'data' .. '/typst-preview/', ':p')
-  vim.fn.mkdir(path, 'p')
-  return path
+  return vim.fn.fnamemodify(vim.fn.stdpath 'data' .. '/typst-preview/', ':p')
 end
+vim.fn.mkdir(M.get_data_path(), 'p')
 
 ---@class AutocmdOpts
 ---@field pattern? string[]|string
