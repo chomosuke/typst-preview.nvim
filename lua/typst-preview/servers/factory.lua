@@ -10,7 +10,7 @@ local M = {}
 ---@param mode mode
 ---@param callback fun(close: fun(), write: fun(data: string), read: fun(on_read: fun(data: string)), link: string)
 ---Called after server spawn completes
-local function spawn(path, mode, callback)
+local function spawn(path, port, mode, callback)
   local server_stdout = assert(vim.uv.new_pipe())
   local server_stderr = assert(vim.uv.new_pipe())
   local tinymist_bin = config.opts.dependencies_bin['tinymist']
@@ -28,7 +28,7 @@ local function spawn(path, mode, callback)
     '--control-plane-host',
     '127.0.0.1:0',
     '--static-file-host',
-    '127.0.0.1:0',
+    '127.0.0.1:' .. port,
     '--root',
     config.opts.get_root(path),
     config.opts.get_main_file(path),
@@ -110,46 +110,65 @@ local function spawn(path, mode, callback)
       return server_output:sub(s + 1, e - 1):gsub('%s+', '')
     end
   end
+
   local function read_server(serr, server_output)
     if serr then
       error(serr)
-    elseif server_output then
-      local control_host =
-        find_host(server_output, 'Control plane server listening on: ')
-        or find_host(server_output, 'Control panel server listening on: ')
-      local static_host =
-        find_host(server_output, 'Static file server listening on: ')
-      if control_host then
-        utils.debug 'Connecting to server'
-        connect(control_host)
-      end
-      if static_host then
-        utils.debug 'Setting link'
-        vim.defer_fn(function()
-          utils.visit(static_host)
-          if callback_param ~= nil then
-            assert(
-              type(callback_param.close) == 'function'
-                and type(callback_param.write) == 'function'
-                and type(callback_param.read) == 'function',
-              "callback_param's type isn't a table of functions"
-            )
-            callback(
-              callback_param.close,
-              callback_param.write,
-              callback_param.read,
-              static_host
-            )
-          else
-            callback_param = static_host
-          end
-        end, 0)
-      end
     end
-    if server_output then
-      utils.debug(server_output)
+
+    if not server_output then
+      return
     end
+
+    if server_output:find 'AddrInUse' then
+      print('Port ' .. port .. ' is already in use')
+      server_stdout:close()
+      server_stderr:close()
+      -- try again at port + 1
+      vim.defer_fn(function()
+        spawn(path, port + 1, mode, callback)
+      end, 0)
+      return
+    end
+
+    local control_host = find_host(
+      server_output,
+      'Control plane server listening on: '
+    ) or find_host(server_output, 'Control panel server listening on: ')
+    local static_host =
+      find_host(server_output, 'Static file server listening on: ')
+    if control_host then
+      utils.debug 'Connecting to server'
+      connect(control_host)
+    end
+    if not static_host then
+      return
+    end
+
+    utils.debug 'Setting link'
+    vim.defer_fn(function()
+      utils.visit(static_host)
+      if callback_param == nil then
+        callback_param = static_host
+        return
+      end
+
+      assert(
+        type(callback_param.close) == 'function'
+          and type(callback_param.write) == 'function'
+          and type(callback_param.read) == 'function',
+        "callback_param's type isn't a table of functions"
+      )
+      callback(
+        callback_param.close,
+        callback_param.write,
+        callback_param.read,
+        static_host
+      )
+    end, 0)
+    utils.debug(server_output)
   end
+
   server_stdout:read_start(read_server)
   server_stderr:read_start(read_server)
 end
@@ -161,7 +180,7 @@ end
 function M.new(path, mode, callback)
   local read_buffer = ''
 
-  spawn(path, mode, function(close, write, read, link)
+  spawn(path, config.opts.port, mode, function(close, write, read, link)
     ---@type Server
     local server = {
       path = path,
@@ -193,7 +212,7 @@ function M.new(path, mode, callback)
         end
 
         if read_buffer ~= '' then
-          utils.debug('Leaving for next read: '..read_buffer)
+          utils.debug('Leaving for next read: ' .. read_buffer)
         end
       end, 0)
     end)
