@@ -14,7 +14,7 @@ local function spawn(path, port, mode, callback)
   local server_stdout = assert(vim.uv.new_pipe())
   local server_stderr = assert(vim.uv.new_pipe())
   local tinymist_bin = config.opts.dependencies_bin['tinymist']
-    or (utils.get_data_path() .. fetch.get_tinymist_bin_name())
+      or (utils.get_data_path() .. fetch.get_tinymist_bin_name())
   local args = {
     'preview',
     '--partial-rendering',
@@ -58,7 +58,7 @@ local function spawn(path, port, mode, callback)
     local stderr = assert(vim.uv.new_pipe())
     local addr = 'ws://' .. host .. '/'
     local websocat_bin = config.opts.dependencies_bin['websocat']
-      or (utils.get_data_path() .. fetch.get_websocat_bin_name())
+        or (utils.get_data_path() .. fetch.get_websocat_bin_name())
     local websocat_handle, _ = assert(vim.uv.spawn(websocat_bin, {
       args = {
         '-B',
@@ -128,44 +128,39 @@ local function spawn(path, port, mode, callback)
       vim.defer_fn(function()
         spawn(path, port + 1, mode, callback)
       end, 0)
-      return
     end
-
     local control_host = find_host(
       server_output,
       'Control plane server listening on: '
     ) or find_host(server_output, 'Control panel server listening on: ')
     local static_host =
-      find_host(server_output, 'Static file server listening on: ')
+        find_host(server_output, 'Static file server listening on: ')
     if control_host then
       utils.debug 'Connecting to server'
       connect(control_host)
     end
-    if not static_host then
-      return
+    if static_host then
+      utils.debug 'Setting link'
+      vim.defer_fn(function()
+        utils.visit(static_host)
+        if callback_param ~= nil then
+          assert(
+            type(callback_param.close) == 'function'
+            and type(callback_param.write) == 'function'
+            and type(callback_param.read) == 'function',
+            "callback_param's type isn't a table of functions"
+          )
+          callback(
+            callback_param.close,
+            callback_param.write,
+            callback_param.read,
+            static_host
+          )
+        else
+          callback_param = static_host
+        end
+      end, 0)
     end
-
-    utils.debug 'Setting link'
-    vim.defer_fn(function()
-      utils.visit(static_host)
-      if callback_param == nil then
-        callback_param = static_host
-        return
-      end
-
-      assert(
-        type(callback_param.close) == 'function'
-          and type(callback_param.write) == 'function'
-          and type(callback_param.read) == 'function',
-        "callback_param's type isn't a table of functions"
-      )
-      callback(
-        callback_param.close,
-        callback_param.write,
-        callback_param.read,
-        static_host
-      )
-    end, 0)
     utils.debug(server_output)
   end
 
