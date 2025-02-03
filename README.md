@@ -97,6 +97,10 @@ require 'typst-preview'.setup {
   -- Example: open_cmd = 'firefox %s -P typst-preview --class typst-preview'
   open_cmd = nil,
 
+  -- Custom port to open the preview server. Default is random.
+  -- Example: port = 8000
+  port = 0,
+
   -- Setting this to 'always' will invert black and white in the preview
   -- Setting this to 'auto' will invert depending if the browser has enable
   -- dark mode

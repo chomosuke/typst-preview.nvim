@@ -126,6 +126,11 @@ Provide a custom format string to open the output link in `%s`.
 Example value for open_cmd: `'firefox %s -P typst-preview --class typst-preview'`.
   Type: `string`, Default: `nil`
 
+*typst-preview.port*
+Provide a custom port for the preview server. If the port  (e.g. 8000) is
+already in use, the plugin will try to use the next port (e.g. 8001).
+  Type: `number`, Default: `0` (i.e. random)
+
 *typst-preview.invert_colors*
 Can be used to invert colors in preview.
 Set to `'never'` to disable.
