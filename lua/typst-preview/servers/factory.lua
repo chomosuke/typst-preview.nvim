@@ -17,7 +17,6 @@ local function spawn(path, port, mode, callback)
       or (utils.get_data_path() .. fetch.get_tinymist_bin_name())
   local args = {
     'preview',
-    '--partial-rendering',
     '--invert-colors',
     config.opts.invert_colors,
     '--preview-mode',
@@ -33,6 +32,10 @@ local function spawn(path, port, mode, callback)
     config.opts.get_root(path),
     config.opts.get_main_file(path),
   }
+
+  if config.opts.partial_rendering then
+    table.insert(args, '--partial-rendering')
+  end
 
   if config.opts.extra_args ~= nil then
     for _, v in ipairs(config.opts.extra_args) do
