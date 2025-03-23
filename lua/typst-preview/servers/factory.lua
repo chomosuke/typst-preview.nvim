@@ -30,7 +30,6 @@ local function spawn(path, port, mode, callback)
     '127.0.0.1:' .. port,
     '--root',
     config.opts.get_root(path),
-    config.opts.get_main_file(path),
   }
 
   if config.opts.partial_rendering then
@@ -42,6 +41,8 @@ local function spawn(path, port, mode, callback)
       table.insert(args, v)
     end
   end
+
+  table.insert(args, config.opts.get_main_file(path))
 
   local server_handle, _ = assert(vim.uv.spawn(tinymist_bin, {
     args = args,
