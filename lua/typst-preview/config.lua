@@ -3,6 +3,7 @@ local M = {
     debug = false,
     open_cmd = nil,
     port = 0, -- tinymist will use a random port if this is 0
+    partial_rendering = true,
     invert_colors = 'never',
     follow_cursor = true,
     dependencies_bin = {
