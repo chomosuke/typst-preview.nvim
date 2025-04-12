@@ -32,10 +32,6 @@ local function spawn(path, port, mode, callback)
     config.opts.get_root(path),
   }
 
-  if config.opts.partial_rendering then
-    table.insert(args, '--partial-rendering')
-  end
-
   if config.opts.extra_args ~= nil then
     for _, v in ipairs(config.opts.extra_args) do
       table.insert(args, v)
