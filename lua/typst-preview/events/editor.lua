@@ -11,9 +11,8 @@ function M.register_autocmds(bufnr)
   local autocmds = {
     {
       event = { 'TextChanged', 'TextChangedI', 'TextChangedP', 'InsertLeave' },
-      callback = function(ser, _)
+      callback = function(_ev)
         servers.update_memory_file(
-          ser,
           utils.get_buf_path(bufnr),
           utils.get_buf_content(bufnr)
         )
@@ -21,7 +20,7 @@ function M.register_autocmds(bufnr)
     },
     {
       event = { 'CursorMoved' },
-      callback = function(ser, _)
+      callback = function(_ev)
         if not config.get_follow_cursor() then
           return
         end
@@ -29,7 +28,7 @@ function M.register_autocmds(bufnr)
         if last_line ~= line then
           -- No scroll when on the same line in insert mode
           last_line = line
-          servers.sync_with_cursor(ser)
+          servers.scroll_preview()
         end
       end,
     },
@@ -40,11 +39,7 @@ function M.register_autocmds(bufnr)
       {
         event = autocmd.event,
         opts = {
-          callback = function(ev)
-            for _, ser in pairs(servers.get_all()) do
-              autocmd.callback(ser, ev)
-            end
-          end,
+          callback = autocmd.callback,
           buffer = bufnr,
         },
       },

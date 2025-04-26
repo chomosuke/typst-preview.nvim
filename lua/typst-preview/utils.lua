@@ -70,6 +70,12 @@ function M.visit(link)
   })
 end
 
+---@param path string
+---@return string
+function M.abs_path(path)
+  return vim.fn.fnamemodify(path, ':p')
+end
+
 ---check if a file exist
 ---@param path string
 function M.file_exist(path)
@@ -167,6 +173,21 @@ function M.length(table)
     count = count + 1
   end
   return count
+end
+
+local id_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+
+---get a random string to be used as a preview task id
+---@param len number
+---@return string
+function M.random_id(len)
+  local id = ""
+  for _i=1,len do
+    local idx = math.random(1, #id_chars)
+    id = id .. id_chars:sub(idx, idx)
+  end
+
+  return id
 end
 
 return M

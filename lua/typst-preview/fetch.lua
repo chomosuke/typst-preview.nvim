@@ -198,6 +198,13 @@ end
 ---@param quiet boolean
 ---@param callback function|nil
 function M.fetch(quiet, callback)
+  if config.opts.use_lsp then
+    if callback ~= nil then
+      callback()
+    end
+    return
+  end
+
   if callback == nil then
     callback = function() end
   end

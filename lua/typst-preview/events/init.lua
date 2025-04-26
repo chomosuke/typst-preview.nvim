@@ -1,3 +1,4 @@
+local config = require 'typst-preview.config'
 local event_server = require 'typst-preview.events.server'
 local utils = require 'typst-preview.utils'
 local editor = require 'typst-preview.events.editor'
@@ -5,15 +6,21 @@ local servers = require 'typst-preview.servers'
 
 local M = {}
 
----Listen to Server's event
----All buffers are already watched via auto command
----@param s Server
-function M.listen(s)
-  event_server.add_listeners(s)
-end
-
----Register autocmds to register autocmds for filetype
+---Setup listeners for server -> editor communication, and register filetype
+---autocmds that setup listeners for editor -> server communication.
 function M.init()
+  -- Listen to Server's event
+  servers.listen_scroll(event_server.on_editor_scroll_to)
+
+  if config.opts.use_lsp then
+    -- When using tinymist via vim.lsp, we don't need to update document state
+    -- nvim already handles it in that case.
+    -- FIXME: Do we still want to use the VimLeavePre autocmd below? Or is it
+    -- sufficient that nvim shuts down tinymist?
+    return
+  end
+
+  -- Register autocmds to register autocmds for filetype
   utils.create_autocmds('typst-preview-all-autocmds', {
     {
       event = 'FileType',

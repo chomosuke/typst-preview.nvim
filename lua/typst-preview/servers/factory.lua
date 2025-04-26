@@ -1,3 +1,4 @@
+local base = require 'typst-preview.servers.base'
 local fetch = require 'typst-preview.fetch'
 local utils = require 'typst-preview.utils'
 local config = require 'typst-preview.config'
@@ -174,21 +175,50 @@ end
 ---@param path string
 ---@param mode mode
 ---@param callback fun(server: Server)
-function M.new(path, mode, callback)
+---@param event_listeners { string: fun(event) }
+function M.new(path, mode, callback, event_listeners)
   local read_buffer = ''
 
   spawn(path, config.opts.port, mode, function(close, write, read, link)
-    ---@type Server
-    local server = {
-      path = path,
-      mode = mode,
-      link = link,
-      suppress = false,
-      close = close,
-      write = write,
-      listenerss = {},
-    }
+    local function exec_cmd(data)
+      write(vim.json.encode(data) .. '\n')
+    end
 
+    local server = base.new_server(path, mode, link)
+
+    server.close = close
+    server.scroll_to = exec_cmd
+
+    ---Update a memory file.
+    ---@param path string
+    ---@param content string
+    function server.update_memory_file(path, content)
+      if server.suppress then
+        return
+      end
+      utils.debug('updating file: ' .. path .. ', main path: ' .. server.path)
+      exec_cmd {
+        event = 'updateMemoryFiles',
+        files = {
+          [path] = content,
+        },
+      }
+    end
+
+    ---Remove a memory file.
+    ---@param path string
+    function server.remove_memory_file(path)
+      if server.suppress then
+        return
+      end
+      utils.debug('removing file: ' .. path)
+      exec_cmd {
+        event = 'removeMemoryFiles',
+        files = { path },
+      }
+    end
+
+    -- FIXME: Move JSON parsing into read()
     read(function(data)
       vim.defer_fn(function()
         read_buffer = read_buffer .. data
@@ -200,11 +230,9 @@ function M.new(path, mode, callback)
           read_buffer = read_buffer:sub(s + 1, -1)
           s, _ = read_buffer:find '\n'
 
-          local listeners = server.listenerss[event.event]
-          if listeners ~= nil then
-            for _, listener in pairs(listeners) do
-              listener(event)
-            end
+          local listener = event_listeners[event.event]
+          if listener ~= nil then
+            listener(event)
           end
         end
 

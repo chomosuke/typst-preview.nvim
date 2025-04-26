@@ -1,101 +1,223 @@
+local base = require 'typst-preview.servers.base'
+local config = require 'typst-preview.config'
+local factory = require 'typst-preview.servers.factory'
+local factory_lsp = require 'typst-preview.servers.factory-lsp'
 local utils = require 'typst-preview.utils'
-local manager = require 'typst-preview.servers.manager'
-local M = {
-  get_last_mode = manager.get_last_mode,
-  init = manager.init,
-  get = manager.get,
-  get_all = manager.get_all,
-  remove = manager.remove,
-  remove_all = manager.remove_all,
-}
+local M = {}
 
----@alias mode 'document'|'slide'
+---All running servers
+---@type Server[]
+local servers = {}
 
----@class (exact) Server
----@field path string Unsaved buffer will not be previewable.
----@field mode mode
----@field link string
----@field suppress boolean Prevent server initiated event to trigger editor initiated events.
----@field close fun()
----@field write fun(data: string)
----@field listenerss { [string]: fun(event: table)[] }
+---The last used preview mode by file path
+---@type { [string]: mode }
+local last_modes = {}
 
----Update a memory file.
----@param self Server
----@param path string
----@param content string
-function M.update_memory_file(self, path, content)
-  if self.suppress then
+---Whether lsp handlers have been registered
+local lsp_handlers_registerd = false
+
+---Listeners
+---@type fun(jump: OnEditorJumpData)[]
+local editor_scroll_to_listeners = {}
+
+function M.on_editor_scroll_to(jump)
+  local start = jump.start
+  local end_ = jump['end']
+  if start == nil or end_ == nil then
     return
   end
-  utils.debug('updating file: ' .. path .. ', main path: ' .. self.path)
-  self.write(vim.json.encode {
-    event = 'updateMemoryFiles',
-    files = {
-      [path] = content,
+
+  utils.debug('scroll editor to line: ' .. end_[1] .. ', character: ' .. end_[2])
+
+  ---@type OnEditorJumpData
+  local parsed_jump = {
+    filepath = jump.filepath,
+    start = {
+      row = start[1],
+      column = start[2],
     },
-  } .. '\n')
+    end_ = {
+      row = end_[1],
+      column = end_[2],
+    },
+  }
+
+  for _, listener in pairs(editor_scroll_to_listeners) do
+    listener(parsed_jump)
+  end
 end
 
----Remove a memory file.
----@param self Server
+---Get last mode that init is called with
 ---@param path string
-function M.remove_memory_file(self, path)
-  if self.suppress then
+---@return mode?
+function M.get_last_mode(path)
+  path = utils.abs_path(path)
+  return last_modes[path]
+end
+
+---@param method string
+---@param handler fun(result)
+local function register_lsp_handler(method, handler)
+  vim.lsp.handlers[method] = function(err, result, ctx)
+    utils.debug(
+      "Received event from server: " .. ctx.method
+      .. ", err = " .. vim.inspect(err)
+      .. ", result = " .. vim.inspect(result)
+    )
+
+    if err ~= nil then
+      return
+    end
+
+    handler(result)
+  end ---@type lsp.Handler
+end
+
+local function init_lsp()
+  if lsp_handlers_registerd then
     return
   end
-  utils.debug('removing file: ' .. path)
-  self.write(vim.json.encode {
-    event = 'removeMemoryFiles',
-    files = { path },
-  })
+
+  register_lsp_handler('tinymist/preview/dispose', function(result)
+    local task_id = result[1]
+
+    M.remove{task_id=task_id}
+  end)
+
+  register_lsp_handler('tinymist/preview/scrollSource', function(result)
+    ---@type JumpInfo
+    local jump = assert(result)
+
+    M.on_editor_scroll_to(jump)
+  end)
+
+  register_lsp_handler('tinymist/documentOutline', function(result)
+    -- ignore
+  end)
+end
+
+---Init a server
+---@param path string
+---@param mode mode
+---@param callback fun(server: Server)
+function M.init(path, mode, callback)
+  path = utils.abs_path(path)
+  assert(
+    next(M.get{path=path, mode=mode}) == nil,
+    'Server with path ' .. path .. ' and mode ' .. mode .. ' already exists.'
+  )
+
+  local function handle_new_server(server)
+    table.insert(servers, server)
+    last_modes[path] = mode
+    callback(server)
+  end
+
+  if config.opts.use_lsp then
+    init_lsp()
+    -- In the LSP case, all events are received by a global handler
+    factory_lsp.new(path, mode, handle_new_server)
+  else
+    -- whereas in the subprocess + websocat case, each server receives events
+    factory.new(path, mode, handle_new_server, {
+      editorScrollTo = M.on_editor_scroll_to,
+    })
+  end
+end
+
+---Get a server
+---@param filter ServerFilter
+---@return { Server[] }?
+function M.get(filter)
+  filter.path = filter.path and utils.abs_path(filter.path)
+
+  ---@type Server[]
+  local result = {}
+  for _, server in pairs(servers) do
+    if base.server_matches(server, filter) then
+      table.insert(result, server)
+    end
+  end
+
+  return result
+end
+
+---Get all servers
+---@return Server[]
+function M.get_all()
+  ---@type Server[]
+  local r = {}
+  for _, ser in pairs(servers) do
+    table.insert(r, ser)
+  end
+  return r
+end
+
+---Remove all servers matching the filter and clean everything up
+---@param filter ServerFilter
+---@return boolean removed Whether at least one matching server existed before.
+function M.remove(filter)
+  filter.path = filter.path and utils.abs_path(filter.path)
+
+  local removed = false
+  for idx, server in pairs(servers) do
+    if base.server_matches(server, filter) then
+      servers[idx] = nil
+      server.close()
+      utils.debug(
+        'Server with path ' .. server.path .. ' and mode ' .. server.mode .. ' closed.'
+      )
+      removed = true
+    end
+  end
+
+  if not removed then
+    utils.debug(
+      'Attempt to remove non-existing server with filter: '
+      .. vim.inspect(filter)
+    )
+  end
+
+  return removed
+end
+
+---Remove all servers
+function M.remove_all()
+  M.remove{}
+end
+
+---@param path string
+---@param content string
+function M.update_memory_file(path, content)
+  for _, server in pairs(servers) do
+    if not server.suppress then
+      server.update_memory_file(path, content)
+    end
+  end
 end
 
 ---Scroll preview to where the cursor is.
----@param self Server
-function M.sync_with_cursor(self)
-  if self.suppress then
-    return
-  end
+function M.scroll_preview()
   local cursor = vim.api.nvim_win_get_cursor(0)
   local line = cursor[1] - 1
   utils.debug('scroll to line: ' .. line .. ', character: ' .. cursor[2])
-  self.write(vim.json.encode {
-    event = 'panelScrollTo',
-    filepath = utils.get_buf_path(0),
-    line = line,
-    character = cursor[2],
-  } .. '\n')
-end
 
----Add a listener for an event from the server
----@param self Server
----@param event string
----@param listener fun(event: table)
-local function add_listener(self, event, listener)
-  if self.listenerss[event] == nil then
-    self.listenerss[event] = {}
+  for _, server in pairs(servers) do
+    if not server.suppress then
+      server.scroll_to {
+        event = 'panelScrollTo',
+        filepath = utils.get_buf_path(0),
+        line = line,
+        character = cursor[2],
+      }
+    end
   end
-  table.insert(self.listenerss[event], listener)
 end
 
 ---Listen to editorScrollTo event from the server
----@param self Server
----@param listener fun(event: { filepath: string, start: { row: integer, column: integer }, end_: { row: integer, column: integer } })
-function M.listen_scroll(self, listener)
-  add_listener(self, 'editorScrollTo', function(event)
-    listener {
-      filepath = event.filepath,
-      start = {
-        row = event.start[1],
-        column = event.start[2],
-      },
-      end_ = {
-        row = event['end'][1],
-        column = event['end'][2],
-      },
-    }
-  end)
+---@param listener fun(event: OnEditorJumpData)
+function M.listen_scroll(listener)
+  table.insert(editor_scroll_to_listeners, listener)
 end
 
 return M

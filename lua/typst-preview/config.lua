@@ -20,6 +20,7 @@ local M = {
     get_main_file = function(path)
       return path
     end,
+    use_lsp = false,
   },
 }
 
