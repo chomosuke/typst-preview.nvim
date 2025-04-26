@@ -35,8 +35,8 @@ local M = {}
 ---@field suppress boolean Prevent server initiated event to trigger editor initiated events.
 ---@field close fun()
 ---@field scroll_to fun(data)
----@field update_memory_file fun(data)
----@field remove_memory_file fun(data)
+---@field update_memory_file fun(path: string, content: string)
+---@field remove_memory_file fun(data: string)
 
 function M.new_server(path, mode, link)
   return {

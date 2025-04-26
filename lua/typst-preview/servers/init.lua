@@ -126,15 +126,17 @@ function M.init(path, mode, callback)
 end
 
 ---Get a server
----@param filter ServerFilter
----@return { Server[] }?
+---@param filter ServerFilter?
+---@return Server[]
 function M.get(filter)
-  filter.path = filter.path and utils.abs_path(filter.path)
+  if filter ~= nil then
+    filter.path = filter.path and utils.abs_path(filter.path)
+  end
 
   ---@type Server[]
   local result = {}
   for _, server in pairs(servers) do
-    if base.server_matches(server, filter) then
+    if filter == nil or base.server_matches(server, filter) then
       table.insert(result, server)
     end
   end
@@ -142,26 +144,17 @@ function M.get(filter)
   return result
 end
 
----Get all servers
----@return Server[]
-function M.get_all()
-  ---@type Server[]
-  local r = {}
-  for _, ser in pairs(servers) do
-    table.insert(r, ser)
-  end
-  return r
-end
-
 ---Remove all servers matching the filter and clean everything up
----@param filter ServerFilter
+---@param filter ServerFilter?
 ---@return boolean removed Whether at least one matching server existed before.
 function M.remove(filter)
-  filter.path = filter.path and utils.abs_path(filter.path)
+  if filter ~= nil then
+    filter.path = filter.path and utils.abs_path(filter.path)
+  end
 
   local removed = false
   for idx, server in pairs(servers) do
-    if base.server_matches(server, filter) then
+    if filter == nil or base.server_matches(server, filter) then
       servers[idx] = nil
       server.close()
       utils.debug(
@@ -172,6 +165,10 @@ function M.remove(filter)
   end
 
   if not removed then
+    -- This is not necessarily a bug: For example, the following can happen:
+    -- 1. We remove a server and send tinymist.doKillPreview
+    -- 2. tinymist sends tinymist/preview/dispose in response
+    -- 3. our listener below calls remove again
     utils.debug(
       'Attempt to remove non-existing server with filter: '
       .. vim.inspect(filter)
@@ -183,7 +180,7 @@ end
 
 ---Remove all servers
 function M.remove_all()
-  M.remove{}
+  M.remove()
 end
 
 ---@param path string
@@ -192,6 +189,15 @@ function M.update_memory_file(path, content)
   for _, server in pairs(servers) do
     if not server.suppress then
       server.update_memory_file(path, content)
+    end
+  end
+end
+
+---@param path string
+function M.remove_memory_file(path)
+  for _, server in pairs(servers) do
+    if not server.suppress then
+      server.remove_memory_file(path)
     end
   end
 end

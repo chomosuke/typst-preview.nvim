@@ -86,6 +86,8 @@ local function spawn(path, port, mode, callback)
     -- -> actually, this currently crashed tinymist on an unwrap(), thus
     -- reasonably handling this case requires an upstream change (such that
     -- tinymist returns an error instead of crashing)
+    -- cf. https://github.com/Myriad-Dreamin/tinymist/issues/1699
+    -- also test with next tinymist release, the respective code has been comletely refactored
     if err ~= nil then
       -- FIXME: better communicate this to the user
       utils.debug("Failed to start preview: " .. err)
