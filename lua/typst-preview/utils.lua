@@ -4,11 +4,29 @@ local M = {}
 ---Open link in browser (platform agnostic)
 ---@param link string
 function M.visit(link)
-  local opts = {}
-  if config.opts.open_cmd ~= nil then
-    opts.cmd = {config.opts.open_cmd }
+  link = 'http://' .. link
+
+  local on_err = function(err)
+    if err ~= nil and err ~= '' then
+      print('typst-preview opening link failed: ' ..  err)
+    end
   end
-  vim.ui.open('http://' .. link, opts)
+
+  if config.opts.open_cmd ~= nil then
+    local cmd = string.format(config.opts.open_cmd, link)
+    M.debug("Opening preview with command: " .. cmd)
+    -- FIXME: The docs recommend using vim.system instead
+    vim.fn.jobstart(cmd, {
+      on_stderr = function(_, data)
+        local msg = table.concat(data or {}, '\n')
+        on_err(msg)
+      end
+    })
+  else
+    M.debug("Opening preview with default command")
+    local _cmd, err = vim.ui.open(link)
+    on_err(err)
+  end
 end
 
 ---@param path string
