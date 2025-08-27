@@ -33,7 +33,7 @@ function M.add_listeners(s)
     end
 
     if event.filepath ~= utils.get_buf_path(0) then
-      vim.cmd('e ' .. event.filepath)
+      vim.cmd('e ' .. vim.fn.fnameescape(event.filepath))
       vim.defer_fn(editorScrollTo, 100)
     else
       editorScrollTo()
