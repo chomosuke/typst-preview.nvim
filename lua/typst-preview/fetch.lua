@@ -29,9 +29,9 @@ local function get_bin_name(map)
   if os == nil or machine == nil or map[os][machine] == nil then
     utils.notify(
       "typst-preview can't figure out your platform.\n"
-        .. 'Please report this bug.\n'
-        .. 'os_uname: '
-        .. vim.inspect(vim.uv.os_uname()),
+      .. 'Please report this bug.\n'
+      .. 'os_uname: '
+      .. vim.inspect(vim.uv.os_uname()),
       vim.log.levels.ERROR
     )
   end
@@ -108,9 +108,9 @@ local function download_bin(bin, quiet, callback)
     if not quiet then
       print(
         "Binary for '"
-          .. bin.name
-          .. "' has been provided in config.\n"
-          .. 'Please ensure manually that it is up to date.\n'
+        .. bin.name
+        .. "' has been provided in config.\n"
+        .. 'Please ensure manually that it is up to date.\n'
       )
     end
     callback(false)
@@ -157,8 +157,8 @@ local function download_bin(bin, quiet, callback)
   if handle == nil then
     utils.notify(
       'Launching curl failed: '
-        .. err
-        .. '\nMake sure curl is installed on the system.'
+      .. err
+      .. '\nMake sure curl is installed on the system.'
     )
   end
 
@@ -180,14 +180,14 @@ end
 function M.bins_to_fetch()
   return {
     {
-      url = 'https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.13.10/'
-        .. M.get_tinymist_bin_name(),
+      url = 'https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.13.28/'
+          .. M.get_tinymist_bin_name(),
       bin_name = M.get_tinymist_bin_name(),
       name = 'tinymist',
     },
     {
       url = 'https://github.com/vi/websocat/releases/download/v1.14.0/'
-        .. M.get_websocat_bin_name(),
+          .. M.get_websocat_bin_name(),
       bin_name = M.get_websocat_bin_name(),
       name = 'websocat',
     },
@@ -206,7 +206,7 @@ function M.fetch(quiet, callback)
     if downloaded > 0 then
       print(
         'All binaries required by typst-preview downloaded to '
-          .. utils.get_data_path()
+        .. utils.get_data_path()
       )
     end
     local bins_to_fetch = {}
