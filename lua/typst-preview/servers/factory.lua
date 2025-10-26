@@ -11,8 +11,6 @@ local M = {}
 ---@param callback fun(close: fun(), write: fun(data: string), read: fun(on_read: fun(data: string)), link: string)
 ---Called after server spawn completes
 local function spawn(path, port, mode, callback)
-  local server_stdout = assert(vim.uv.new_pipe())
-  local server_stderr = assert(vim.uv.new_pipe())
   local tinymist_bin = config.opts.dependencies_bin['tinymist']
       or (utils.get_data_path() .. fetch.get_tinymist_bin_name())
   local args = {
@@ -40,6 +38,8 @@ local function spawn(path, port, mode, callback)
 
   table.insert(args, config.opts.get_main_file(path))
 
+  local server_stdout = assert(vim.uv.new_pipe())
+  local server_stderr = assert(vim.uv.new_pipe())
   local server_handle, _ = assert(vim.uv.spawn(tinymist_bin, {
     args = args,
     stdio = { nil, server_stdout, server_stderr },
@@ -113,7 +113,7 @@ local function spawn(path, port, mode, callback)
     end
   end
 
-  local function read_server(serr, server_output)
+  local function read_server(stdsrc, serr, server_output)
     if serr then
       error(serr)
     end
@@ -124,6 +124,7 @@ local function spawn(path, port, mode, callback)
 
     if server_output:find 'AddrInUse' then
       print('Port ' .. port .. ' is already in use')
+      -- TODO: aren't we leaking memory here by not closing the server?
       server_stdout:close()
       server_stderr:close()
       -- try again at port + 1
@@ -163,11 +164,16 @@ local function spawn(path, port, mode, callback)
         end
       end, 0)
     end
-    utils.debug(server_output)
+    local err_prefix = 'error: '
+    if server_output:sub(1, err_prefix:len()) == err_prefix then
+      utils.print('preview server ' .. stdsrc .. ': ' .. server_output)
+    else
+      utils.debug('preview server ' .. stdsrc .. ': ' .. server_output)
+    end
   end
 
-  server_stdout:read_start(read_server)
-  server_stderr:read_start(read_server)
+  server_stdout:read_start(function(serr, o) read_server('stdout', serr, o) end)
+  server_stderr:read_start(function(serr, o) read_server('stderr', serr, o) end)
 end
 
 ---create a new Server
