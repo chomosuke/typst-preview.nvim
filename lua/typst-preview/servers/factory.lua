@@ -166,9 +166,9 @@ local function spawn(path, port, mode, callback)
     end
     local err_prefix = 'error: '
     if server_output:sub(1, err_prefix:len()) == err_prefix then
-      utils.print('preview server ' .. stdsrc .. ': ' .. server_output)
+      utils.print(tinymist_bin .. ' ' .. stdsrc .. ': ' .. server_output)
     else
-      utils.debug('preview server ' .. stdsrc .. ': ' .. server_output)
+      utils.debug('tinymist ' .. stdsrc .. ': ' .. server_output)
     end
   end
 
