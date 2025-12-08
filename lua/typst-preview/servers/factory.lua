@@ -27,7 +27,7 @@ local function spawn(path, host, port, mode, callback)
     '--control-plane-host',
     '0.0.0.0:0',
     '--static-file-host',
-    '0.0.0.0::' .. port,
+    '0.0.0.0:' .. port,
     '--root',
     config.opts.get_root(path),
   }
