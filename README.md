@@ -101,6 +101,10 @@ require 'typst-preview'.setup {
   -- Example: port = 8000
   port = 0,
 
+  -- Custom host to bind the preview server to.
+  -- Example: port = 0.0.0.0
+  host = 127.0.0.1,
+
   -- Setting this to 'always' will invert black and white in the preview
   -- Setting this to 'auto' will invert depending if the browser has enable
   -- dark mode
