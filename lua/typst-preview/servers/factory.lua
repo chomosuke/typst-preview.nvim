@@ -64,7 +64,7 @@ local function spawn(path, host, port, mode, callback)
         '-B',
         '10000000',
         '--origin',
-        'http://localhost',
+        'http://0.0.0.0',
         addr,
       },
       stdio = { stdin, stdout, stderr },
