@@ -10,7 +10,7 @@ local M = {}
 ---@param mode mode
 ---@param callback fun(close: fun(), write: fun(data: string), read: fun(on_read: fun(data: string)), link: string)
 ---Called after server spawn completes
-local function spawn(path, port, mode, callback)
+local function spawn(path, host, port, mode, callback)
   local server_stdout = assert(vim.uv.new_pipe())
   local server_stderr = assert(vim.uv.new_pipe())
   local tinymist_bin = config.opts.dependencies_bin['tinymist']
@@ -23,11 +23,11 @@ local function spawn(path, port, mode, callback)
     mode,
     '--no-open',
     '--data-plane-host',
-    '127.0.0.1:0',
+    host .. ':0',
     '--control-plane-host',
-    '127.0.0.1:0',
+    host .. ':0',
     '--static-file-host',
-    '127.0.0.1:' .. port,
+    host .. ':' .. port,
     '--root',
     config.opts.get_root(path),
   }
@@ -177,7 +177,7 @@ end
 function M.new(path, mode, callback)
   local read_buffer = ''
 
-  spawn(path, config.opts.port, mode, function(close, write, read, link)
+  spawn(path, config.opts.host, config.opts.port, mode, function(close, write, read, link)
     ---@type Server
     local server = {
       path = path,
