@@ -1,3 +1,5 @@
+local root_markers = { 'typst.toml', '.git' }
+
 local M = {
   opts = {
     debug = false,
@@ -11,11 +13,19 @@ local M = {
     },
     extra_args = nil,
     get_root = function(path_of_main_file)
-      local root = os.getenv 'TYPST_ROOT'
-      if root then
-        return root
+      local env_root = os.getenv 'TYPST_ROOT'
+      if env_root then
+        return env_root
       end
-      return vim.fn.fnamemodify(path_of_main_file, ':p:h')
+
+      -- Use project markers to pick a root that still allows parent imports
+      local main_dir = vim.fs.dirname(vim.fn.fnamemodify(path_of_main_file, ':p'))
+      local found = vim.fs.find(root_markers, { path = main_dir, upward = true })
+      if #found > 0 then
+        return vim.fs.dirname(found[1])
+      end
+
+      return main_dir
     end,
     get_main_file = function(path)
       return path

@@ -131,7 +131,15 @@ require 'typst-preview'.setup {
     if root then
       return root
     end
-    return vim.fn.fnamemodify(path_of_main_file, ':p:h')
+
+    -- Look for a project marker so imports from parent dirs stay inside root
+    local main_dir = vim.fs.dirname(vim.fn.fnamemodify(path_of_main_file, ':p'))
+    local found = vim.fs.find({ 'typst.toml', '.git' }, { path = main_dir, upward = true })
+    if #found > 0 then
+      return vim.fs.dirname(found[1])
+    end
+
+    return main_dir
   end,
 
   -- This function will be called to determine the main file of the typst
