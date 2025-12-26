@@ -103,7 +103,7 @@ require 'typst-preview'.setup {
 
   -- Custom host to bind the preview server to.
   -- Note that '0.0.0.0' is not supported and [won't be](https://github.com/Myriad-Dreamin/tinymist/issues/2105)
-  -- Example: port = '192.168.0.10'
+  -- Example: host = '192.168.0.10'
   host = '127.0.0.1',
 
   -- Setting this to 'always' will invert black and white in the preview
