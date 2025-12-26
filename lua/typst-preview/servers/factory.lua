@@ -33,8 +33,24 @@ local function spawn(path, port, mode, callback)
   }
 
   if config.opts.extra_args ~= nil then
-    for _, v in ipairs(config.opts.extra_args) do
-      table.insert(args, v)
+    local extra = config.opts.extra_args
+    if type(extra) == 'function' then
+      local ok, res = pcall(extra, path, mode, port)
+      if ok and res ~= nil then
+        if type(res) == 'table' then
+          for _, v in ipairs(res) do
+            table.insert(args, v)
+          end
+        elseif type(res) == 'string' then
+          table.insert(args, res)
+        end
+      end
+    elseif type(extra) == 'table' then
+      for _, v in ipairs(extra) do
+        table.insert(args, v)
+      end
+    else
+      error('config.opts.extra_args must be a table or function')
     end
   end
 
