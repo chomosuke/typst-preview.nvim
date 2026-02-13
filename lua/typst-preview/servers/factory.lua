@@ -144,7 +144,7 @@ local function spawn(path, host, port, mode, callback)
       server_stderr:close()
       -- try again at port + 1
       vim.defer_fn(function()
-        spawn(path, port + 1, mode, callback)
+        spawn(path, host, port + 1, mode, callback)
       end, 0)
     end
     local control_host = find_host(
