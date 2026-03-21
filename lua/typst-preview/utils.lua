@@ -87,6 +87,7 @@ end
 function M.get_data_path()
   return vim.fn.fnamemodify(vim.fn.stdpath 'data' .. '/typst-preview/', ':p')
 end
+
 vim.fn.mkdir(M.get_data_path(), 'p')
 
 ---@class AutocmdOpts
@@ -120,13 +121,15 @@ end
 
 local file = nil
 
+M.log_path = M.get_data_path() .. 'log.txt'
+
 ---print that only work when opts.debug = true
 ---@param data string
 function M.debug(data)
   if config.opts.debug then
     local err
     if file == nil then
-      file, err = io.open(M.get_data_path() .. 'log.txt', "a")
+      file, err = io.open(M.log_path, "a")
     end
     if file == nil then
       error("Can't open record file!: " .. err)
