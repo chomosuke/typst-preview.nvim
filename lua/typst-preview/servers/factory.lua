@@ -56,10 +56,18 @@ local function spawn(path, host, port, mode, callback)
 
   table.insert(args, config.opts.get_main_file(path))
 
+  local start_time_ns = vim.loop.hrtime()
   local server_handle, _ = assert(vim.uv.spawn(tinymist_bin, {
     args = args,
     stdio = { nil, server_stdout, server_stderr },
-  }))
+  }, function()
+    local exit_time_ns = vim.loop.hrtime()
+    local ns_of_100_ms = 1000 * 1000 * 100
+    if exit_time_ns - start_time_ns < ns_of_100_ms then
+      utils.print('tinymist exited within 0.1 second of starting, please set debug = true and check ' ..
+      utils.log_path .. ' for more details')
+    end
+  end))
   utils.debug('spawning server ' .. tinymist_bin .. ' with args:')
   utils.debug(vim.inspect(args))
 
