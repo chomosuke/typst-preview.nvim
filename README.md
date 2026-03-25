@@ -122,8 +122,8 @@ require 'typst-preview'.setup {
   -- Warning: Be aware that your version might be older than the one
   -- required.
   dependencies_bin = {
-    ['tinymist'] = nil,
-    ['websocat'] = nil
+    tinymist = nil,
+    websocat = nil
   },
 
   -- A list of extra arguments (or nil) to be passed to previewer.
@@ -157,7 +157,8 @@ require 'typst-preview'.setup {
 
 ### Use tinymist installed from Mason
 Set `dependencies_bin` option to
-`dependencies_bin = { ['tinymist'] = 'tinymist' }` should point towards the
+`dependencies_bin = { tinymist = 'tinymist' }` or, on Windows
+`dependencies_bin = { tinymist = 'tinymist.cmd' }` should point towards the
 Mason installation of tinymist.
 
 ## ❓ Comparison with other tools

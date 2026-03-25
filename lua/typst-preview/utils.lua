@@ -33,19 +33,19 @@ end
 function M.is_arm64()
   local machine = vim.uv.os_uname().machine
   return machine == 'aarch64'
-      or machine == 'aarch64_be'
-      or machine == 'armv8b'
-      or machine == 'armv8l'
-      or machine == 'arm64'
+    or machine == 'aarch64_be'
+    or machine == 'armv8b'
+    or machine == 'armv8l'
+    or machine == 'arm64'
 end
 
 local open_cmd
 if M.is_macos() then
   open_cmd = 'open'
 elseif M.is_windows() then
-  open_cmd = 'explorer.exe'
+  open_cmd = 'start'
 elseif M.is_wsl() then
-  open_cmd = '/mnt/c/Windows/explorer.exe'
+  open_cmd = 'wslview'
 else
   open_cmd = 'xdg-open'
 end
@@ -129,7 +129,7 @@ function M.debug(data)
   if config.opts.debug then
     local err
     if file == nil then
-      file, err = io.open(M.log_path, "a")
+      file, err = io.open(M.log_path, 'a')
     end
     if file == nil then
       error("Can't open record file!: " .. err)
