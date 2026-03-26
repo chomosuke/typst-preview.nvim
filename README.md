@@ -78,6 +78,9 @@ plugin, i.e., `v1.1.*` instead of `v1.*`.
   - Scroll preview to the current cursor position. This can be used in combination with
     `:TypstPreviewNoFollowCursor` so that the preview only scroll to the current cursor position
     when you want it to.
+- `:TypstPreviewExport [output]` or `require 'typst-preview'.export_pdf()`:
+  - Export the current typst file to PDF using `typst compile`.
+  - If `output` is omitted, it exports next to the main file with a `.pdf` extension.
 
 ## ⚙️ Configuration
 
@@ -117,6 +120,10 @@ require 'typst-preview'.setup {
   -- Whether the preview will follow the cursor in the source file
   follow_cursor = true,
 
+  -- Typst binary used for PDF export
+  -- Example: typst_bin = '/usr/local/bin/typst'
+  typst_bin = 'typst',
+
   -- Provide the path to binaries for dependencies.
   -- Setting this will skip the download of the binary by the plugin.
   -- Warning: Be aware that your version might be older than the one
@@ -129,6 +136,10 @@ require 'typst-preview'.setup {
   -- A list of extra arguments (or nil) to be passed to previewer.
   -- For example, extra_args = { "--input=ver=draft", "--ignore-system-fonts" }
   extra_args = nil,
+
+  -- Extra arguments (or nil) to be passed to `typst compile` for export.
+  -- For example, export_args = { "--input=ver=draft" }
+  export_args = nil,
 
   -- This function will be called to determine the root of the typst project
   get_root = function(path_of_main_file)

@@ -10,6 +10,7 @@ local M = {
   set_follow_cursor = config.set_follow_cursor,
   get_follow_cursor = config.get_follow_cursor,
   sync_with_cursor = commands.sync_with_cursor,
+  export_pdf = commands.export_pdf,
   update = function()
     fetch.fetch(false)
   end,
