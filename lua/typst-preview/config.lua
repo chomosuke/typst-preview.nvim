@@ -22,10 +22,8 @@ local M = {
       end
 
       -- Use project markers to pick a root that still allows parent imports
-      local main_dir =
-        vim.fs.dirname(vim.fn.fnamemodify(path_of_main_file, ':p'))
-      local found =
-        vim.fs.find(root_markers, { path = main_dir, upward = true })
+      local main_dir = vim.fs.dirname(vim.fn.fnamemodify(path_of_main_file, ':p'))
+      local found = vim.fs.find(root_markers, { path = main_dir, upward = true })
       if #found > 0 then
         return vim.fs.dirname(found[1])
       end
