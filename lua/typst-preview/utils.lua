@@ -43,7 +43,9 @@ local open_cmd
 if M.is_macos() then
   open_cmd = 'open'
 elseif M.is_windows() then
-  open_cmd = 'start'
+  -- using 'start' here breaks the plugin on Git Bash, but 'explorer.exe' should
+  -- always be available and always work
+  open_cmd = 'explorer.exe'
 elseif M.is_wsl() then
   open_cmd = 'wslview'
 else
@@ -53,13 +55,16 @@ end
 ---Open link in browser (platform agnostic)
 ---@param link string
 function M.visit(link)
-  local cmd
+  local cmd, cmd_str
   if config.opts.open_cmd ~= nil then
     cmd = string.format(config.opts.open_cmd, 'http://' .. link)
+    cmd_str = cmd
   else
-    cmd = string.format('%s http://%s', open_cmd, link)
+    cmd = {open_cmd, 'http://' .. link}
+    cmd_str = cmd[1] .. cmd[2]
   end
-  M.debug('Opening preview with command: ' .. cmd)
+
+  M.debug('Opening preview with command: ' .. cmd_str)
   vim.fn.jobstart(cmd, {
     on_stderr = function(_, data)
       local msg = table.concat(data or {}, '\n')
