@@ -61,7 +61,7 @@ function M.visit(link)
     cmd_str = cmd
   else
     cmd = {open_cmd, 'http://' .. link}
-    cmd_str = cmd[1] .. cmd[2]
+    cmd_str = cmd[1] .. ' ' .. cmd[2]
   end
 
   M.debug('Opening preview with command: ' .. cmd_str)
