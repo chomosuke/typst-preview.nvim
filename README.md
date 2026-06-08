@@ -114,6 +114,11 @@ require 'typst-preview'.setup {
   -- separately.
   invert_colors = 'never',
 
+  -- Only render the visible portion of the document.
+  -- Improves performance significantly for large documents.
+  -- Disable if you experience rendering issues.
+  partial_rendering = true,
+
   -- Whether the preview will follow the cursor in the source file
   follow_cursor = true,
 
