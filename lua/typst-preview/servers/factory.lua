@@ -32,6 +32,10 @@ local function spawn(path, host, port, mode, callback)
     config.opts.get_root(path),
   }
 
+  if config.opts.partial_rendering then
+    table.insert(args, '--partial-rendering=true')
+  end
+
   if config.opts.extra_args ~= nil then
     local extra = config.opts.extra_args
     if type(extra) == 'function' then
