@@ -22,6 +22,7 @@ local function spawn(path, host, port, mode, callback)
     '--preview-mode',
     mode,
     '--no-open',
+    '--verbose',
     '--data-plane-host',
     host .. ':0',
     '--control-plane-host',
