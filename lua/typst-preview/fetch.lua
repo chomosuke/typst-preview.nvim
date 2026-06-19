@@ -180,7 +180,7 @@ end
 function M.bins_to_fetch()
   return {
     {
-      url = 'https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.14.12/'
+      url = 'https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.15.0/'
           .. M.get_tinymist_bin_name(),
       bin_name = M.get_tinymist_bin_name(),
       name = 'tinymist',
