@@ -42,12 +42,13 @@ end
 local open_cmd
 if M.is_macos() then
   open_cmd = 'open'
-elseif M.is_windows() then
+elseif M.is_windows() or M.is_wsl() then
   -- using 'start' here breaks the plugin on Git Bash, but 'explorer.exe' should
   -- always be available and always work
+  --
+  -- Also using 'explorer.exe' on wsl as well as windows since I tested this and
+  -- it works on my machine.
   open_cmd = 'explorer.exe'
-elseif M.is_wsl() then
-  open_cmd = 'wslview'
 else
   open_cmd = 'xdg-open'
 end
