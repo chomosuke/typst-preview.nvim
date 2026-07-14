@@ -12,6 +12,7 @@ local M = {
       ['tinymist'] = nil,
       ['websocat'] = nil,
     },
+    partial_rendering = true,
     extra_args = nil,
     get_root = function(path_of_main_file)
       local env_root = os.getenv 'TYPST_ROOT'
