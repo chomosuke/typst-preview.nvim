@@ -23,11 +23,9 @@ local function spawn(path, host, port, mode, callback)
     mode,
     '--no-open',
     '--data-plane-host',
-    host .. ':0',
+    host .. ':' .. port,
     '--control-plane-host',
     host .. ':0',
-    '--static-file-host',
-    host .. ':' .. port,
     '--root',
     config.opts.get_root(path),
   }
@@ -141,6 +139,7 @@ local function spawn(path, host, port, mode, callback)
     end
   end
 
+  local link_found = false
   local function read_server(serr, server_output)
     if serr then
       error(serr)
@@ -163,13 +162,18 @@ local function spawn(path, host, port, mode, callback)
       server_output,
       'Control plane server listening on: '
     ) or find_host(server_output, 'Control panel server listening on: ')
-    local static_host =
-        find_host(server_output, 'Static file server listening on: ')
+    -- the page is served by the data plane. tinymist also logs it as the
+    -- static file server, so only take the first of the two
+    local static_host = not link_found and (
+      find_host(server_output, 'Data plane server listening on: ')
+      or find_host(server_output, 'Static file server listening on: ')
+    )
     if control_host then
       utils.debug 'Connecting to server'
       connect(control_host)
     end
     if static_host then
+      link_found = true
       utils.debug 'Setting link'
       vim.defer_fn(function()
         utils.visit(static_host)
