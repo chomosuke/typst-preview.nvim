@@ -23,11 +23,9 @@ local function spawn(path, host, port, mode, callback)
     mode,
     '--no-open',
     '--data-plane-host',
-    host .. ':0',
+    host .. ':' .. port,
     '--control-plane-host',
     host .. ':0',
-    '--static-file-host',
-    host .. ':' .. port,
     '--root',
     config.opts.get_root(path),
   }
@@ -164,7 +162,7 @@ local function spawn(path, host, port, mode, callback)
       'Control plane server listening on: '
     ) or find_host(server_output, 'Control panel server listening on: ')
     local static_host =
-        find_host(server_output, 'Static file server listening on: ')
+        find_host(server_output, 'Data plane server listening on: ')
     if control_host then
       utils.debug 'Connecting to server'
       connect(control_host)
