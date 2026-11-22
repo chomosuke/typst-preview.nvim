@@ -11,17 +11,21 @@ function M.register_autocmds(bufnr)
   local autocmds = {
     {
       event = { 'TextChanged', 'TextChangedI', 'TextChangedP', 'InsertLeave' },
-      callback = function(ser, _)
-        servers.update_memory_file(
-          ser,
-          utils.get_buf_path(bufnr),
-          utils.get_buf_content(bufnr)
-        )
+      -- Run once per event, outside the per-server loop. The message is
+      -- identical for every server, so building it per server would re-read
+      -- the whole buffer and re-encode it once for each open preview.
+      prepare = function()
+        local path = utils.get_buf_path(bufnr)
+        local content = utils.get_buf_content(bufnr)
+        return servers.build_memory_file_update(path, content)
+      end,
+      callback = function(ser, payload)
+        servers.send_memory_file_update(ser, payload)
       end,
     },
     {
       event = { 'CursorMoved' },
-      callback = function(ser, _)
+      callback = function(ser)
         if not config.get_follow_cursor() then
           return
         end
@@ -40,9 +44,17 @@ function M.register_autocmds(bufnr)
       {
         event = autocmd.event,
         opts = {
-          callback = function(ev)
-            for _, ser in pairs(servers.get_all()) do
-              autocmd.callback(ser, ev)
+          callback = function()
+            local all_servers = servers.get_all()
+            if #all_servers == 0 then
+              return
+            end
+            local payload
+            if autocmd.prepare then
+              payload = autocmd.prepare()
+            end
+            for _, ser in pairs(all_servers) do
+              autocmd.callback(ser, payload)
             end
           end,
           buffer = bufnr,
