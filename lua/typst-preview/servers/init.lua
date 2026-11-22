@@ -20,21 +20,39 @@ local M = {
 ---@field write fun(data: string)
 ---@field listenerss { [string]: fun(event: table)[] }
 
+---Build a memory-file update message once so every server can share it.
+---@param path string
+---@param content string
+---@return { path: string, message: string } payload
+function M.build_memory_file_update(path, content)
+  return {
+    path = path,
+    message = vim.json.encode {
+      event = 'updateMemoryFiles',
+      files = {
+        [path] = content,
+      },
+    } .. '\n',
+  }
+end
+
+---Send a previously built memory-file update to one server.
+---@param self Server
+---@param payload { path: string, message: string }
+function M.send_memory_file_update(self, payload)
+  if self.suppress then
+    return
+  end
+  utils.debug('updating file: ' .. payload.path .. ', main path: ' .. self.path)
+  self.write(payload.message)
+end
+
 ---Update a memory file.
 ---@param self Server
 ---@param path string
 ---@param content string
 function M.update_memory_file(self, path, content)
-  if self.suppress then
-    return
-  end
-  utils.debug('updating file: ' .. path .. ', main path: ' .. self.path)
-  self.write(vim.json.encode {
-    event = 'updateMemoryFiles',
-    files = {
-      [path] = content,
-    },
-  } .. '\n')
+  M.send_memory_file_update(self, M.build_memory_file_update(path, content))
 end
 
 ---Remove a memory file.
